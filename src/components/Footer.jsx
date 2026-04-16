@@ -5,7 +5,7 @@ import Logo from '../assets/images/recruitease_logo.svg'
 const Footer = () => {
     return (
         <>
-            <footer className="font-geist border-t bg-[white] mt-6 md:mt-8 lg:mt-12 xl:mt-16">
+            <footer className=" border-t bg-[white] mt-6 md:mt-8 lg:mt-12 xl:mt-16">
                 <div className="text-black max-w-7xl mx-auto px-4 grid gap-6 md:grid-cols-2 lg:grid-cols-5 text-sm py-6 md:py-8 lg:py-10">
 
                     {/* Logo */}

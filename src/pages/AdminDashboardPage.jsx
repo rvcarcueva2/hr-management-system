@@ -1,34 +1,25 @@
-import { NavLink } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-
+import AreaChartDashboard from "@/components/AreaChartDashboard";
+import BarChartDashboard from "@/components/BarChartDashboard";
+import CardDashboard from "@/components/CardDashboard";
 
 const AdminDashboardPage = () => {
 
-    const { user, logout } = useAuth()
 
     return (
         <>
-            <Card className="max-w-sm">
-                <CardHeader>
-                    <CardTitle>Project Overview</CardTitle>
-                    <CardDescription>
-                        Track progress and recent activity for your Vite app.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    Your design system is ready. Start building your next component.
-                </CardContent>
-            </Card>
-        </>
-    )
-}
+            <div className="gap-2 ">
 
-export default AdminDashboardPage
+                <CardDashboard />
+                <div className="flex gap-2">
+
+                <AreaChartDashboard />
+                <BarChartDashboard />
+                </div>
+
+            </div>
+
+        </>
+    );
+};
+
+export default AdminDashboardPage;

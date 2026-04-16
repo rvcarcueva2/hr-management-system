@@ -15,11 +15,12 @@ const JobPage = () => {
 
 
 
+
     return (
         <>
             <div className='max-w-6xl mx-auto min-h-screen'>
                 <section>
-                    <div className=' font-geist container mt-6 py-6 px-6 '>
+                    <div className=' container mt-6 py-6 px-6 '>
                         <Link
                             to='/jobs'
                             className='text-[#378ADD] hover:text-[#6baef1] flex items-center group'
@@ -30,7 +31,7 @@ const JobPage = () => {
                     </div>
                 </section>
 
-                <section className='font-geist'>
+                <section>
                     <div className='container m-auto py-10 px-6'>
                         <div className='grid grid-cols-1 md:grid-cols-1 w-full gap-6'>
                             <main>
@@ -40,13 +41,13 @@ const JobPage = () => {
 
                                         <button
                                             onClick={() => setShowModal(true)}
-                                            className="bg-white text-black border py-2 px-6 rounded-full hover:shadow-md transition-shadow"
+                                            className="bg-white text-black border py-2 px-6 rounded-full hover:shadow-md transition-shadow cursor-pointer"
                                         >
                                             Apply Now
                                         </button>
 
                                         {showModal && ( // Only shows true no need a false signature
-                                            <ApplyModal setShowModal={setShowModal} />
+                                            <ApplyModal setShowModal={setShowModal} job={job}/>
                                         )}
 
                                     </div>
@@ -54,7 +55,7 @@ const JobPage = () => {
                                     <h1 className='text-3xl font-bold mb-3'>{job.title}</h1>
                                     <div className='flex items-center'>
                                         <FaMapMarker className='text-[#378ADD] mr-1 -mt-1' />
-                                        <p className='text-[#378ADD]'>{job.location}</p>
+                                        <p className='text-[#378ADD]'>{job.companies?.location}</p>
                                     </div>
                                 </div>
 
@@ -142,19 +143,16 @@ const jobLoader = async ({ params }) => {
             name,
             description,
             contact_email,
-            contact_phone
-            )`
-        )
+            contact_phone,
+            location
+        )`)
         .eq('id', params.id)
         .single()
 
-    if (error) {
-        throw new Error(error.message);
-    }
+    if (error) throw new Error(error.message);
 
     return data
 };
-
 
 
 export { JobPage as default, jobLoader };

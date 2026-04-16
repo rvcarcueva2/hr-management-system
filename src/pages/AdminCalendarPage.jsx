@@ -1,8 +1,9 @@
 import React from 'react'
+import ScheduleCalendar from '../components/ScheduleCalendar'
 
 const AdminCalendarPage = () => {
   return (
-    <div>AdminCalendarPage</div>
+    <ScheduleCalendar />
   )
 }
 

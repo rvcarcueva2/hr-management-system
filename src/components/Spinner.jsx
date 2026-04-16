@@ -5,10 +5,10 @@ const override = {
     margin: '100px auto',
 };
 
-const Spinner = ({ loading }) => {
+const Spinner = ({ loading = true }) => {
     return (
         <ClipLoader
-            color='#0F6E56'
+            color='#378ADD'
             loading={loading}
             cssOverride={override}
             size={150}

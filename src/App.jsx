@@ -1,34 +1,48 @@
 import './index.css'
-
+import { useState, lazy, Suspense } from "react";
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
+import Spinner from './components/Spinner';
+
+
+// Layouts
 import MainLayout from './layouts/MainLayout'
-import HomePage from './pages/HomePage'
-import JobsPage from './pages/JobsPage'
-import JobPage, { jobLoader } from './pages/JobPage'
-
-
 import AdminLayout from './layouts/AdminLayout'
-import AdminPage from './pages/AdminDashboardPage'
-import AdminJobsPage from './pages/AdminJobsPage'
-import AdminCalendarPage from './pages/AdminCalendarPage'
-
 import AuthLayout from './layouts/AuthLayout'
-import LoginPage from './pages/auth/LoginPage'
-import SignUpPage from './pages/auth/SignUpPage'
-import AdmintTicketPage from './pages/AdmintTicketPage'
 
-import NotFoundPage from './pages/NotFoundPage'
+// Pages
+const HomePage = lazy(() => import('./pages/HomePage'))
+const JobsPage = lazy(() => import('./pages/JobsPage'))
+const JobPage = lazy(() => import('./pages/JobPage'))
+const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 
+const AdminPage = lazy(() => import('./pages/AdminDashboardPage'))
+const AdminApplicationsPage = lazy(() => import('./pages/AdminApplicationsPage'))
+const AdminCalendarPage = lazy(() => import('./pages/AdminCalendarPage'))
+const AdminJobsPage = lazy(() => import('./pages/AdminJobsPage'))
+const AdminMentorsPage = lazy(() => import('./pages/AdminMentorsPage'))
+const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'))
+const AdmintTicketPage = lazy(() => import('./pages/AdmintTicketPage'))
+
+const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
+
+// Loader
+const jobLoader = async (args) => {
+  const module = await import('./pages/JobPage')
+  return module.jobLoader(args)
+}
 
 function App() {
+  const [loading, setLoading] = useState(true);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
       <>
-        <Route path='/' element={<MainLayout />}>
+        <Route path='/' element={<MainLayout />} >
           <Route index element={<HomePage />} />
           <Route path='jobs' element={<JobsPage />} />
           <Route path='jobs/:id' element={<JobPage />} loader={jobLoader} />
+          <Route path='profile' element={<ProfilePage />} />
 
           <Route path='*' element={<NotFoundPage />} />
 
@@ -36,14 +50,17 @@ function App() {
 
         <Route path='/admin' element={<AdminLayout />}>
           <Route index element={<AdminPage />} />
-          <Route path='admin-jobs' element={<AdminJobsPage />} />
+          <Route path='admin-applications' element={<AdminApplicationsPage />} />
           <Route path='admin-calendar' element={<AdminCalendarPage />} />
+          <Route path='admin-jobs' element={<AdminJobsPage />} />
+          <Route path='admin-mentors' element={<AdminMentorsPage />} />
+          <Route path='admin-users' element={<AdminUsersPage />} />
           <Route path='admin-ticket' element={<AdmintTicketPage />} />
         </Route>
 
         <Route element={<AuthLayout />}>
           <Route path='/auth/login' element={<LoginPage />} />
-          <Route path='/auth/sign-up' element={<SignUpPage />} />
+
         </Route>
 
       </>
@@ -54,7 +71,9 @@ function App() {
 
   return (
     <>
-      <RouterProvider router={router} />
+      <Suspense fallback={<Spinner loading />}>
+        <RouterProvider router={router} />
+      </Suspense>
     </>
   )
 

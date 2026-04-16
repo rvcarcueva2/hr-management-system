@@ -10,7 +10,7 @@ import JobType from './JobType'
 
 
 const JobListings = ({ isHome = false }) => {
-    const { jobs, loading } = useJobs() // Hook loader
+    const { jobs, loading } = useJobs(); // Hook loader
 
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedType, setSelectedType] = useState('')
@@ -66,7 +66,7 @@ const JobListings = ({ isHome = false }) => {
 
     return (
         <>
-            <section className="font-geist mt-4 px-4 py-10">
+            <section className=" mt-4 px-4 py-10">
                 <div className="container lg:container m-auto p-4">
 
                     {/* Title */}

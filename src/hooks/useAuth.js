@@ -71,7 +71,7 @@ const useAuth = () => {
             setLoading(false);
         }
     };
-    
+
     // Login
     const login = async (email, password) => {
         setLoading(true);

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import Logo from '../assets/images/recruitease_logo.svg'
 import { Link, useNavigate } from 'react-router-dom';
-import { FcGoogle } from "react-icons/fc";
 import useAuth from '../hooks/useAuth';
 
 
@@ -48,7 +47,7 @@ const SignUpForm = () => {
     return (
         <>
             <div className="h-full  px-8 py-12 flex justify-center scroll-smooth">
-                <div className="w-full max-w-md -mt-10 ">
+                <div className="w-full max-w-md">
 
                     <img
                         className="h-20 w-auto object-contain -ml-4 mb-2"
@@ -74,11 +73,11 @@ const SignUpForm = () => {
                                 <p className="text-red-500 text-sm">{error}</p>
                             )}
                         </div>
-
+                        
 
                         <div className='flex gap-2'>
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                <label className="block text-sm  text-gray-600 mb-1">
                                     First Name
                                 </label>
                                 <input
@@ -92,7 +91,7 @@ const SignUpForm = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
+                                <label className="block text-sm  text-gray-600 mb-1">
                                     Last Name
                                 </label>
                                 <input
@@ -108,7 +107,7 @@ const SignUpForm = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-600 mb-1">
+                            <label className="block text-sm  text-gray-600 mb-1">
                                 Email
                             </label>
                             <input
@@ -122,7 +121,7 @@ const SignUpForm = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-600 mb-1">
+                            <label className="block text-sm  text-gray-600 mb-1">
                                 Password
                             </label>
                             <input
@@ -138,7 +137,7 @@ const SignUpForm = () => {
 
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-600 mb-1">
+                            <label className="block text-sm  text-gray-600 mb-1">
                                 Confirm Password
                             </label>
                             <input
@@ -157,30 +156,16 @@ const SignUpForm = () => {
                         <button
                             type="submit"
                             //disabled={loading}
-                            className="w-full bg-[#0F6E56] text-white py-3 rounded-xl hover:shadow-md font-semibold "
+                            className="w-full bg-[#0F6E56] text-white py-3 rounded-xl hover:shadow-md font-semibold cursor-pointer"
                         >
                             {loading ? 'Signing Up...' : 'Sign Up'}
                         </button>
 
-                        {/* Divider */}
-                        <div className="flex items-center gap-3 my-4">
-                            <div className="flex-1 h-px bg-gray-200"></div>
-                            <span className="text-gray-400 text-sm">or</span>
-                            <div className="flex-1 h-px bg-gray-200"></div>
-                        </div>
-
-                        {/* Google */}
-                        <button
-                            type="button"
-                            className="w-full flex items-center justify-center border py-3 rounded-xl hover:bg-gray-50 transition "
-                        >
-                            Continue with Google <FcGoogle className='mx-3 -mt-1.5 text-2xl' />
-                        </button>
 
                         {/* Footer */}
-                        <p className="text-sm text-gray-500 text-center mt-4">
+                        <p className="text-sm text-gray-500 text-center ">
                             Already have an account?{' '}
-                            <Link to={'/auth/login'} className="text-[#378ADD] font-medium cursor-pointer">
+                            <Link to={'/auth/login'} className="text-[#378ADD]  cursor-pointer">
                                 Login
                             </Link>
                         </p>

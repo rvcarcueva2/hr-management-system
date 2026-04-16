@@ -34,10 +34,10 @@ const LoginForm = () => {
 
     return (
         <>
-            <div className=" font-geist flex items-center justify-center bg-white px-8 py-12">
+            <div className=" flex items-center justify-center bg-white px-8 py-12 -mt-20">
                 <div className="w-full max-w-md">
 
-                    <div className=' font-geist container mb-2 '>
+                    <div className='container mb-2 '>
                         <Link
                             to='/'
                             className='text-gray-500 text-sm hover:text-gray-600 flex items-center group'
@@ -57,8 +57,8 @@ const LoginForm = () => {
                     <h2 className="text-4xl font-bold text-gray-800 mb-2">
                         Welcome Back
                     </h2>
-                    <p className="text-gray-500 mb-6">
-                        Login to your account
+                    <p className="text-gray-500">
+                        Sign in to your account
                     </p>
 
 
@@ -69,12 +69,12 @@ const LoginForm = () => {
                         <div>
                             {/* Error */}
 
-                            <div className="min-h-[20px]">
+                            <div className="min-h-5 mt-3 mb-3 ">
                                 {error && (
                                     <p className="text-red-500 text-sm">{error}</p>
                                 )}
                             </div>
-                         
+
                             {/* Email */}
                             <label className="block mt-2 text-sm font-medium  text-gray-600 mb-1">
                                 Email
@@ -105,38 +105,22 @@ const LoginForm = () => {
                             />
                         </div>
 
+                        <div className='-mt-2 text-end'>
+                            <a className='text-sm text-gray-500 hover:underline cursor-pointer'>
+                                Forgot Password?
+                            </a>
+                        </div>
+
 
                         {/* Button */}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-[#0F6E56] text-white py-3 rounded-xl hover:shadow-md font-semibold "
+                            className="w-full bg-[#0F6E56] mt-2 text-white py-3 rounded-xl hover:shadow-md font-semibold cursor-pointer "
                         >
-                            {loading ? 'Logging in...' : 'Login'}
+                            {loading ? 'Signing in...' : 'Sign In'}
                         </button>
 
-                        {/* Divider */}
-                        <div className="flex items-center gap-3 my-4">
-                            <div className="flex-1 h-px bg-gray-200"></div>
-                            <span className="text-gray-400 text-sm">or</span>
-                            <div className="flex-1 h-px bg-gray-200"></div>
-                        </div>
-
-                        {/* Google Login */}
-                        <button
-                            type="button"
-                            className="w-full flex items-center justify-center border py-3 rounded-xl hover:bg-gray-50 transition"
-                        >
-                            Continue with Google <FcGoogle className='mx-3 -mt-1.5 text-2xl' />
-                        </button>
-
-                        {/* Footer */}
-                        <p className="text-sm text-gray-500 text-center mt-4">
-                            Don’t have an account?{' '}
-                            <Link to={'/auth/sign-up'} className="text-[#378ADD] font-medium cursor-pointer">
-                                Sign up
-                            </Link>
-                        </p>
 
                     </form>
 
