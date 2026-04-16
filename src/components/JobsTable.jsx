@@ -88,6 +88,14 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs"
+import {
+    Card,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+
+} from "@/components/ui/card"
 
 import useJobs from "@/hooks/useJobs"
 
@@ -110,7 +118,7 @@ function DragHandle({ id }) {
     )
 }
 
-const columns = [
+const getColumns = (setDeleteModal) => [
     {
         id: "drag",
         header: () => null,
@@ -185,7 +193,7 @@ const columns = [
     },
     {
         id: "actions",
-        cell: () => (
+        cell: ({ row }) => (
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button
@@ -198,15 +206,17 @@ const columns = [
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-32">
-
-
-                    <DropdownMenuItem variant="destructive"><IconTrashFilled className="-mt-0.5" color="#cc0000" /> Delete</DropdownMenuItem>
-
+                    <DropdownMenuItem variant="destructive" onClick={() => setDeleteModal({ open: true, jobId: row.original.id })}
+                    >
+                        <IconTrashFilled className="-mt-0.5" color="#cc0000" />
+                        Delete
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         ),
     },
 ]
+
 
 
 function DraggableRow({ row }) {
@@ -287,6 +297,10 @@ function TableCellViewer({ item }) {
                                         month: 'short',
                                         day: 'numeric',
                                         year: 'numeric',
+                                        hour: 'numeric',
+                                        minute: '2-digit',
+                                        second: '2-digit',
+                                        hour12: false
 
                                     })}
                                 </div>
@@ -298,7 +312,7 @@ function TableCellViewer({ item }) {
                                         hour: 'numeric',
                                         minute: '2-digit',
                                         second: '2-digit',
-                                        hour12: true
+                                        hour12: false
                                     })}
                                 </div>
                                 <Separator />
@@ -455,6 +469,7 @@ function AddJobDrawer() {
         formData.description &&
         formData.salary
 
+    // Add job drawer
     return (
         <Drawer open={open} onOpenChange={setOpen} direction={isMobile ? "bottom" : "right"}>
             <DrawerTrigger asChild>
@@ -587,6 +602,7 @@ function AddJobDrawer() {
 }
 
 export function DataTable({ data: initialData }) {
+    const { deleteJob } = useJobs();
     const [data, setData] = React.useState(() => initialData)
     const [rowSelection, setRowSelection] = React.useState({})
     const [columnVisibility, setColumnVisibility] = React.useState({})
@@ -604,6 +620,10 @@ export function DataTable({ data: initialData }) {
         () => data?.map(({ id }) => id) || [],
         [data]
     )
+    const [deleteModal, setDeleteModal] = React.useState({ open: false, jobId: null })
+    // Pass setDeleteModal into columns
+    const columns = React.useMemo(() => getColumns(setDeleteModal), [setDeleteModal])
+
 
     const table = useReactTable({
         data,
@@ -636,31 +656,53 @@ export function DataTable({ data: initialData }) {
     }
 
 
+    const handleDelete = async () => {
+        const toastId = toast.loading('Deleting job...')
+
+        if (!deleteModal.jobId) {
+            toast.error('No job selected')
+            return
+        }
+        const success = await deleteJob(deleteModal.jobId, { id: toastId })
+        if (!success) {
+            toast.error('Failed to delete job')
+            return
+        }
+        toast.success('Job deleted successfully')
+        setDeleteModal({ open: false, jobId: null })
+        setTimeout(() => window.location.reload(), 1500)
+    }
+
+
     return (
         <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
-            <div className="flex items-center justify-between px-4 lg:px-6 ">
-                <Label htmlFor="view-selector" className="sr-only">View</Label>
-                <Select defaultValue="outline" >
-                    <SelectTrigger className="flex w-fit @4xl/main:hidden" size="sm" id="view-selector">
-                        <SelectValue placeholder="Select a view" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="outline">Outline</SelectItem>
-                        <SelectItem value="past-performance">Past Performance</SelectItem>
-                        <SelectItem value="key-personnel">Key Personnel</SelectItem>
-                        <SelectItem value="focus-documents">Focus Documents</SelectItem>
-                    </SelectContent>
-                </Select>
-                <TabsList className="hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:bg-muted-foreground/30 **:data-[slot=badge]:px-1 @4xl/main:flex">
-                    <TabsTrigger value="outline">Outline</TabsTrigger>
-                    <TabsTrigger value="past-performance">
-                        Past Performance <Badge variant="secondary">3</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="key-personnel">
-                        Key Personnel <Badge variant="secondary">2</Badge>
-                    </TabsTrigger>
-                    <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
-                </TabsList>
+            <div className="flex items-center justify-end px-4 lg:px-6 ">
+                {deleteModal.open && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                        <Card className="w-full max-w-md mx-4">
+                            <CardHeader>
+                                <CardTitle>Delete Job</CardTitle>
+                                <CardDescription>
+                                    This action cannot be undone. This will permanently delete the job and all its associated records.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardFooter className="flex justify-end gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setDeleteModal({ open: false, jobId: null })}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    onClick={handleDelete}
+                                >
+                                    Delete
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </div>
+                )}
                 <div className="flex items-center gap-2">
                     <DropdownMenu>
                         <button onClick={() => window.location.reload()} className="bg-white border p-1 rounded-full hover:shadow-sm cursor-pointer">
@@ -782,15 +824,7 @@ export function DataTable({ data: initialData }) {
                     </div>
                 </div>
             </TabsContent>
-            <TabsContent value="past-performance" className="flex flex-col px-4 lg:px-6">
-                <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-            </TabsContent>
-            <TabsContent value="key-personnel" className="flex flex-col px-4 lg:px-6">
-                <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-            </TabsContent>
-            <TabsContent value="focus-documents" className="flex flex-col px-4 lg:px-6">
-                <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-            </TabsContent>
+
         </Tabs>
     )
 }

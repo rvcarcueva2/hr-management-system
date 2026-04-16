@@ -107,7 +107,7 @@ const useJobs = () => {
                     description
                 })
                 .eq("id", jobId)
-                
+
 
             if (updateError) throw updateError;
             return true;
@@ -121,7 +121,28 @@ const useJobs = () => {
         }
     };
 
-    return { jobs, loading, submitting, error, fetchJobs, submitJob, updateJob  }
+    const deleteJob = async (jobId) => {
+        setLoading(true);
+        setError(false);
+        try {
+            const { error: deleteError } = await supabase
+                .from('jobs')
+                .delete()
+                .eq("id", jobId)
+
+            if (deleteError) throw deleteError;
+            return true;
+
+        } catch (err) {
+            console.log('Error deleting job:', err);
+            setError(err.message)
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return { jobs, loading, submitting, error, fetchJobs, submitJob, updateJob, deleteJob }
 }
 
 
