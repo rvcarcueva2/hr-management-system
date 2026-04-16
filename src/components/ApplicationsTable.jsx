@@ -329,7 +329,7 @@ function TableCellViewer({ item }) {
     }
 
     const handleSubmit = async () => {
-        const toastId = toast.loading('Updating application')
+        const toastId = toast.loading('Updating application...')
 
         const success = await updateStatus(item.id, status, reviewerId, assigned)
         if (!success) {

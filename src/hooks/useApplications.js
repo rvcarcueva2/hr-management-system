@@ -45,7 +45,7 @@ const useApplications = () => {
                     supabase
                         .from('users')
                         .select('id, display_name')
-                        .eq('role', 'reviewer')
+                        .eq('role', 'Reviewer')
                 ]);
 
                 if (error) throw error;
