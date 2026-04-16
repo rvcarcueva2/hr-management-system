@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import { FaSearch } from "react-icons/fa";
 import { MdOutlineLogout } from "react-icons/md";
 import { RiNotification3Line } from "react-icons/ri";
+import useAvatarUpload from "../hooks/useAvatarUpload";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 
 
 const AdminNavBar = () => {
 
     const { user, logout } = useAuth()
+    const { avatarUrl } = useAvatarUpload();
     const navigate = useNavigate()
     const [showDropdown, setShowDropdown] = useState(false)
 
@@ -25,25 +29,44 @@ const AdminNavBar = () => {
 
     ]
 
-
     return (
         <>
-            <nav className="font-geist bg-white shadow-sm">
+            <nav className=" bg-white shadow-sm">
                 <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
                     <div className="flex h-20 items-center justify-between">
-                        <div className="flex flex-1 mr-8 items-center justify-end md:items-stretch md:justify-end">
-                            <div className="md:ml-auto flex items-center gap-4">
-                                <div className="border rounded-full p-3 green-600/20 cursor-pointer"> 
+                        <div className="flex flex-1 mr-8 items-center justify-between md:items-stretch md:justify-between">
 
-                                <RiNotification3Line className="text-xl text-[#378ADD]"/>
+                            <form onSubmit={(e) => e.preventDefault()}
+                                className=" flex items-center border border-gray-300 rounded-lg w-80 max-w-md">
+                                <button
+                                    type="submit"
+                                    className="px-3 text-gray-400 hover:text-gray-600 cursor-pointer"
+                                >
+                                    <FaSearch className="w-4 h-4" />
+                                </button>
+                                <input
+                                    type="text"
+                                    placeholder="Search jobs or application..."
+                                    className="flex-1 px-1 py-2 text-sm text-gray-800 bg-transparent outline-none"
+                                />
+                            </form>
+                            <div className="md:ml-auto flex items-center gap-4">
+                                <div className="border rounded-full p-2.5 green-600/20 cursor-pointer">
+                                    <RiNotification3Line className="text-xl text-[#0F6E56]" />
                                 </div>
 
                                 <div className="relative inline-block text-left">
                                     {/* Trigger */}
                                     <div
+
                                         onClick={() => setShowDropdown(prev => !prev)}
-                                        className="bg-gray-400 rounded-full w-10 h-10 cursor-pointer hover:shadow-md"
-                                    />
+                                        className="bg-gray-400 rounded-full w-11 h-11 cursor-pointer hover:shadow-md"
+                                    >
+                                        {avatarUrl ? (<Avatar>
+                                            <AvatarImage src={avatarUrl} />
+                                            <AvatarFallback></AvatarFallback>
+                                        </Avatar>) : (<div className="bg-gray-400 rounded-full w-11 h-11 cursor-pointer hover:shadow-md" ></div>)}
+                                    </div>
 
                                     {/* Dropdown */}
                                     <div

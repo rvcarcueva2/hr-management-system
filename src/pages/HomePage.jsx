@@ -8,7 +8,6 @@ const HomePage = () => {
 
     return (
         <>
-        
             <Hero />
 
             <div className='max-w-7xl mx-auto'>

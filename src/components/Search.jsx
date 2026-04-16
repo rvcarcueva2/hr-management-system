@@ -1,7 +1,4 @@
-import { useState } from 'react'
 import { FaSearch } from "react-icons/fa"
-import CategoryDropdown from './CategoryDropdown'
-import useJobs from '../hooks/useJobs'
 
 const Search = ({search, setSearch}) => {
 

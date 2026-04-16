@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom';
 import { FaMapMarker } from 'react-icons/fa'
 
 
@@ -34,14 +35,14 @@ const JobListing = ({ job }) => {
                     <div className="flex flex-col lg:flex-row justify-between mb-4">
                         <div className="text-[#378ADD] mb-3 flex">
                             <FaMapMarker className='mx-2' />
-                            <p className='-mt-0.5'>{job.location}</p>
+                            <p className='-mt-0.5'>{job.companies?.location}</p>
                         </div>
-                        <a
-                            href={`/jobs/${job.id}`}
-                            className="h-[36px] bg-white border text-black px-4 py-2 rounded-lg text-center text-sm hover:shadow-md transition-shadow"
+                        <Link
+                            to={`/jobs/${job.id}`}
+                            className="h-9 bg-white border text-black px-4 py-2 rounded-lg text-center text-sm hover:shadow-md transition-shadow"
                         >
                             Read More
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>

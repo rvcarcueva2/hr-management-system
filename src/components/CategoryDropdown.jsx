@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { FaLayerGroup, } from 'react-icons/fa'
 
-const CategoryDropdown = ({ selectedCategory, setSelectedCategory }) => { //useState for JobListings.jsx
+const CategoryDropdown = ({ selectedCategory, setSelectedCategory }) => { //useState from JobListings.jsx
 
     const [showDropdown, setShowDropdown] = useState(false);
 
@@ -49,9 +49,9 @@ const CategoryDropdown = ({ selectedCategory, setSelectedCategory }) => { //useS
                 {/* Button */}
                 <button
                     onClick={() => setShowDropdown((prevState) => (!prevState))}
-                    className="border border-gray-300 rounded-lg px-3 py-2 flex items-center gap-2 hover:bg-gray-100 transition"
+                    className="border border-gray-300 rounded-lg px-3 py-2 flex items-center gap-2 hover:shadow-sm cursor-pointer"
                 >
-                    <FaLayerGroup className="w-4 h-4 text-[#0d624d]" />
+                    <FaLayerGroup className="w-4 h-4 text-gray-600" />
                 </button>
 
                 {/* Dropdown */}
