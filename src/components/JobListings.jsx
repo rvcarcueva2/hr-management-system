@@ -6,6 +6,7 @@ import Search from './Search'
 import CategoryDropdown from './CategoryDropdown'
 import Pagination from './Pagination'
 import JobType from './JobType'
+import SalaryGradeDropdown from './SalaryGradeDropdown'
 
 
 
@@ -17,6 +18,7 @@ const JobListings = ({ isHome = false }) => {
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1); // Default 1 page
     const [postsPerPage] = useState(6); // 6 posts per page
+    const [selectedSalaryGrade, setSelectedSalaryGrade] = useState('')
 
 
     // Filter
@@ -48,9 +50,20 @@ const JobListings = ({ isHome = false }) => {
             );
         }
 
+    
+        if (selectedSalaryGrade && selectedSalaryGrade !== 'All Salary Grades') {
+            processed = processed.filter(
+                job => job.salary === selectedSalaryGrade);
+        }
+        if (selectedSalaryGrade == 'All Salary Grades') {
+            processed = processed.filter(
+                job => job.salary
+            )
+        }
+
         return processed;
 
-    }, [jobs, selectedCategory, selectedType, search]);
+    }, [jobs, selectedCategory, selectedType, search, selectedSalaryGrade]);
 
 
     // Pagination
@@ -81,6 +94,7 @@ const JobListings = ({ isHome = false }) => {
                             <JobType selectedType={selectedType} setSelectedType={setSelectedType} />
                             <Search search={search} setSearch={setSearch} />
                             <CategoryDropdown selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+                            <SalaryGradeDropdown selectedSalaryGrade={selectedSalaryGrade} setSelectedSalaryGrade={setSelectedSalaryGrade} />
 
                         </div>
                     )}
