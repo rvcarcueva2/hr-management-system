@@ -37,12 +37,12 @@ const JobListing = ({ job }) => {
                             <FaMapMarker className='mx-2' />
                             <p className='-mt-0.5'>{job.companies?.location}</p>
                         </div>
-                        <Link
-                            to={`/jobs/${job.id}`}
+                        <a
+                            href={`/jobs/${job.id}`}
                             className="h-9 bg-white border text-black px-4 py-2 rounded-lg text-center text-sm hover:shadow-md transition-shadow"
                         >
                             Read More
-                        </Link>
+                        </a>
                     </div>
                 </div>
             </div>
