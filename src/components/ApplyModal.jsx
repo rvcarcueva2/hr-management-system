@@ -210,17 +210,17 @@ const ApplyModal = ({ setShowModal, job }) => { // Props from JobPage
                 </div>
 
                 {/* Button */}
-                <div className="flex justify-end gap-3 mt-4">
+                <div className="flex justify-end gap-2 mt-4">
                     {step === 2 ? (< button
                         type="button"
                         onClick={() => setStep(1)}
-                        className="px-5 py-2 border rounded-lg hover:shadow-sm cursor-pointer"
+                        className="px-5 py-2 text-sm border rounded-full hover:shadow-sm cursor-pointer"
                     >
                         Back
                     </button>) : (< button
                         type="button"
                         onClick={() => setShowModal(false)}
-                        className="px-5 py-2 border rounded-lg hover:shadow-sm cursor-pointer"
+                        className="px-5 py-2 text-sm border rounded-full hover:shadow-sm cursor-pointer"
                     >
                         Cancel
                     </button>)}
@@ -228,14 +228,14 @@ const ApplyModal = ({ setShowModal, job }) => { // Props from JobPage
                     {step === 1 ? (<button
                         type="button"
                         onClick={() => setStep(2)}
-                        className="px-5 py-2 bg-[#378ADD] text-white rounded-lg hover:shadow-lg cursor-pointer"
+                        className="px-5 py-2 text-sm bg-[#378ADD] text-white rounded-full hover:shadow-lg cursor-pointer"
                     >
                         Next
                     </button>) : (<button
                         type="submit"
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="px-5 py-2 bg-[#378ADD] text-white rounded-lg hover:shadow-lg cursor-pointer"
+                        className="px-5 py-2 text-sm bg-[#378ADD] text-white rounded-full hover:shadow-lg cursor-pointer"
                     >
                         {loading ? "Submitting..." : "Submit"}
                     </button>

@@ -1,10 +1,12 @@
 import supabase from '../utils/supabaseClient'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link, useLoaderData } from 'react-router-dom'
-import { FaChevronLeft, FaMapMarker, FaCircle, FaChevronDown } from 'react-icons/fa';
+import { FaChevronLeft, FaMapMarker, FaCircle, FaChevronDown, FaCheck } from 'react-icons/fa';
 import ApplyModal from '../components/ApplyModal';
 import useCourses from '../hooks/useCourses';
+import { Button } from '@/components/ui/button';
+import EnrollModal from '@/components/EnrollModal';
 
 const JobPage = () => {
     const { id } = useParams();
@@ -12,8 +14,29 @@ const JobPage = () => {
     const { courses } = useCourses(id);
     const [showModal, setShowModal] = useState(false);
     const [showLearnDropdown, setShowLearnDropdown] = useState(false);
+    const [showEnrollModal, setShowEnrollModal] = useState(false);
+    const [isEnrolled, setIsEnrolled] = useState(false);
 
+    useEffect(() => {
+        const checkEnrollment = async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const userId = session?.user?.id
+            if (!userId || !courses.length) return
 
+            const courseIds = courses.map(c => c.id)
+
+            const { data } = await supabase
+                .from("enrollees")
+                .select("id")
+                .eq("user_id", userId)
+                .in("course_id", courseIds)
+                .limit(1)
+
+            if (data && data.length > 0) setIsEnrolled(true)
+        }
+
+        checkEnrollment()
+    }, [courses]) // runs whenever courses load
 
 
     return (
@@ -41,13 +64,13 @@ const JobPage = () => {
 
                                         <button
                                             onClick={() => setShowModal(true)}
-                                            className="bg-white text-black border py-2 px-6 rounded-full hover:shadow-md transition-shadow cursor-pointer"
+                                            className="bg-white  border py-3 px-6 rounded-full hover:shadow-md transition-shadow cursor-pointer"
                                         >
                                             Apply Now
                                         </button>
 
                                         {showModal && ( // Only shows true no need a false signature
-                                            <ApplyModal setShowModal={setShowModal} job={job}/>
+                                            <ApplyModal setShowModal={setShowModal} job={job} />
                                         )}
 
                                     </div>
@@ -123,6 +146,38 @@ const JobPage = () => {
 
                                             </div>
                                         ))}
+                                        <div className="text-end mt-6 mb-2">
+
+                                            {/* <button
+                                                onClick={() => !isEnrolled && setShowEnrollModal(true)}
+                                                className="bg-[#378ADD] text-white border py-3 px-5 rounded-full hover:shadow-md transition-shadow cursor-pointer text-sm"
+                                            >
+                                               {isEnrolled ? "Enrolled" : "Enroll Course"}
+                                            </button> */}
+
+                                            {isEnrolled ? (
+                                                <span className="flex items-center justify-end gap-2 text-[#378ADD] font-medium">
+                                                   <FaCheck className="text-md" /> Enrolled 
+                                                </span>
+                                            ) : (
+                                                <button
+                                                    onClick={() => setShowEnrollModal(true)}
+                                                    className="bg-[#378ADD] text-white border py-3 px-5 rounded-full hover:shadow-md transition-shadow cursor-pointer text-sm"
+                                                >
+                                                    Enroll Course
+                                                </button>
+                                            )}
+
+                                        </div>
+                                        {showEnrollModal && (
+                                            <EnrollModal
+                                                setShowEnrollModal={setShowEnrollModal}
+                                                courses={courses}
+                                                jobTitle={job.title}
+                                                onEnrollSuccess={() => setIsEnrolled(true)}
+                                            />
+                                        )}
+
                                     </div>
 
                                 </div>
