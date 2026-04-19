@@ -357,7 +357,7 @@ function TableCellViewer({ item }) {
                         <div className="flex flex-col gap-3">
 
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="categpry">Category</Label>
+                                <Label htmlFor="category">Category</Label>
                                 <Select value={category} onValueChange={setCategory}>
                                     <SelectTrigger id="category" className="w-full">
                                         <SelectValue placeholder="Select a status" />
