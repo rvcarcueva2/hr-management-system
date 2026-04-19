@@ -4,20 +4,19 @@ import { FaRegCircleCheck } from "react-icons/fa6";
 import { PiInstagramLogoFill } from "react-icons/pi";
 import { BsLinkedin } from "react-icons/bs";
 import AvatarUpload from './AvatarUpload';
-import Spinner from "./Spinner";
 import { useParams } from 'react-router-dom'
 import useEnrollees from "../hooks/useEnrollees";
 import useUsers from '@/hooks/useUsers';
 import CompleteModal from './CompleteModal';
 
-const ProfileForm = ({ profile, loading }) => {
+const ProfileForm = ({ profile }) => {
     const { id } = useParams();
     const { user } = useUsers();
     const isOwnProfile = user?.id === id;
     const isReviewer = user?.role === 'Reviewer';
     const canViewEnrollments = isOwnProfile || isReviewer;
 
-    const { enrollments, loading: enrollLoading, updateCompleted } = useEnrollees(
+    const { enrollments, updateCompleted } = useEnrollees(
         isReviewer ? id : null
     );
 
@@ -42,45 +41,42 @@ const ProfileForm = ({ profile, loading }) => {
     const [showCompleteModal, setShowCompleteModal] = useState(false);
     const [selectedEnrolleeId, setSelectedEnrolleeId] = useState(null);
 
+    const isViewOnly = !!id && user?.id !== id;
+
+
+
 
     return (
         <>
-        
+
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 ">
 
                 <div className="w-full my-6 lg:col-span-2">
 
                     <div className="p-6 m-auto mb-4 w-full h-full bg-white border rounded-lg shadow-md flex flex-col">
                         <form className="flex flex-col md:flex-row gap-14 items-start">
-
-                            <AvatarUpload />
-
-
+                            <AvatarUpload userId={id || user?.id} isViewOnly={isViewOnly} />
                             <div className="w-full md:w-2/3 space-y-5">
                                 <div className='my-2'>
 
                                     <p className="block text-xl font-semibold mb-1">{profile?.display_name}</p>
                                 </div>
                                 <div>
-
                                     <p className="block text-md text-gray-600 font-medium mb-1">
                                         {profile?.bio}
 
                                     </p>
-
                                 </div>
-
                                 <ul className='flex gap-2'>
-
                                     {icon.map((item, index) => {
                                         const Icon = item.icon
                                         return (
-
-                                            <li key={index} className='border rounded-full p-2'><Icon size={item.size} className='text-gray-600' /> </li>)
-                                    })
-                                    }
+                                            <li key={index} className='border rounded-full p-2'>
+                                                <Icon size={item.size} className='text-gray-600' />
+                                            </li>
+                                        )
+                                    })}
                                 </ul>
-
                             </div>
                         </form>
 
@@ -171,8 +167,6 @@ const ProfileForm = ({ profile, loading }) => {
 
                         {!canViewEnrollments ? (
                             ''
-                        ) : enrollLoading ? (
-                            <Spinner loading={loading} />
                         ) : enrollments.length === 0 ? (
                             <p className="text-sm mt-4 text-gray-400">No courses enrolled yet.</p>
                         ) : (
@@ -200,23 +194,32 @@ const ProfileForm = ({ profile, loading }) => {
                                         >
                                             {courses.map((course) => (
                                                 <>
-                                                    <div className='flex'>
+                                                    <div className='flex '>
 
-                                                        <div
+                                                        <a
                                                             key={course.courseId}
-                                                            className="flex min-w-xl bg-gray-50 border rounded-lg p-4 my-2 mr-3 shadow-sm hover:bg-gray-100 cursor-pointer"
+                                                            href={course.courseLink}
+                                                            target="_blank"
+
+                                                            className="flex w-119 bg-gray-50 border rounded-lg p-4 my-2 mr-3 shadow-sm hover:bg-gray-100 cursor-pointer"
                                                         >
                                                             <p className="font-bold text-gray-800">{course.courseTitle}</p>
-                                                        </div>
-                                                        {(course.completed) ? (
-                                                            <div className='m-auto'>
+                                                        </a>
+                                                        {course.completed ? (
+                                                            <div className='m-auto '>
                                                                 <FaRegCircleCheck className='text-[26px] text-green-700 pb-1' />
                                                             </div>
+                                                        ) : (id && user?.role === 'Reviewer' && user?.id !== id) ? (
+                                                            <button
+                                                                disabled
+                                                                className='m-auto w-40 text-center cursor-default'>
+                                                                <p className="text-xs font-bold text-gray-500">Not Completed</p>
+                                                            </button>
                                                         ) : (
                                                             <button
                                                                 onClick={() => {
-                                                                    setSelectedEnrolleeId(course.enrollmentId)
-                                                                    setShowCompleteModal(true)
+                                                                    setSelectedEnrolleeId(course.enrollmentId);
+                                                                    setShowCompleteModal(true);
                                                                 }}
                                                                 className='m-auto w-40 text-center'>
                                                                 <p className="text-xs font-bold text-gray-500 hover:text-gray-600 cursor-pointer">Mark as Complete</p>
@@ -234,7 +237,9 @@ const ProfileForm = ({ profile, loading }) => {
                             <CompleteModal
                                 setShowCompleteModal={setShowCompleteModal}
                                 enrolleeId={selectedEnrolleeId}
-                                updateCompleted={updateCompleted} />}
+                                updateCompleted={updateCompleted}
+                            />
+                        }
                     </div>
                 </div>
 

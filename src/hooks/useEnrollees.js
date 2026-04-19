@@ -26,6 +26,7 @@ const useEnrollees = (targetUserId = null) => {
                         course:courses (
                             id,
                             title,
+                            course_link,
                             job:jobs (
                                 id,
                                 title
@@ -54,6 +55,7 @@ const useEnrollees = (targetUserId = null) => {
                         enrollmentId: enrollment.id,
                         courseId: enrollment.course.id,
                         courseTitle: enrollment.course.title,
+                        courseLink: enrollment.course.course_link,
                         completed: enrollment.completed,
                     });
                 }

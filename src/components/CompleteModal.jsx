@@ -20,7 +20,7 @@ const CompleteModal = ({ setShowCompleteModal, enrolleeId, updateCompleted }) =>
         setTimeout(() => window.location.reload(), 1500)
     }
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 supports-backdrop-filter:backdrop-blur-xs">
             <div className="bg-gray-50 rounded-lg shadow-lg w-full max-w-md p-8">
                 <h2 className="text-lg font-semibold text-gray-800 mb-1">
                     Confirm to complete this course

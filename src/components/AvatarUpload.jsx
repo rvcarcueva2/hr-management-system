@@ -1,7 +1,7 @@
 import useAvatarUpload from "../hooks/useAvatarUpload";
 
-const AvatarUpload = () => {
-    const { avatarUrl, uploading, error, uploadAvatar } = useAvatarUpload();
+const AvatarUpload = ({ userId, isViewOnly = false }) => {
+    const { avatarUrl, uploading, error, uploadAvatar } = useAvatarUpload(userId);
 
     const handleUpload = (e) => {
         const file = e.target.files[0];
@@ -24,16 +24,18 @@ const AvatarUpload = () => {
 
             {error && <p className="text-red-500 text-sm">{error}</p>}
 
-            <label className="cursor-pointer bg-gray-100 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition">
-                {uploading ? 'Uploading...' : 'Upload Image'}
-                <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleUpload}
-                    disabled={uploading}
-                />
-            </label>
+            {!isViewOnly && (
+                <label className="cursor-pointer bg-gray-100 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition">
+                    {uploading ? 'Uploading...' : 'Upload Image'}
+                    <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleUpload}
+                        disabled={uploading}
+                    />
+                </label>
+            )}
         </div>
     );
 };
