@@ -1,16 +1,27 @@
-import React from 'react'
-import { FaFacebookSquare } from "react-icons/fa";
+import { useState } from 'react'
+import { FaFacebookSquare, FaBook } from "react-icons/fa";
+import { FaRegCircleCheck } from "react-icons/fa6";
 import { PiInstagramLogoFill } from "react-icons/pi";
 import { BsLinkedin } from "react-icons/bs";
-import useUsers from '../hooks/useUsers';
 import AvatarUpload from './AvatarUpload';
 import Spinner from "./Spinner";
+import { useParams } from 'react-router-dom'
+import useEnrollees from "../hooks/useEnrollees";
+import useUsers from '@/hooks/useUsers';
+import CompleteModal from './CompleteModal';
 
+const ProfileForm = ({ profile, loading }) => {
+    const { id } = useParams();
+    const { user } = useUsers();
+    const isOwnProfile = user?.id === id;
+    const isReviewer = user?.role === 'Reviewer';
+    const canViewEnrollments = isOwnProfile || isReviewer;
 
-const ProfileForm = () => {
+    const { enrollments, loading: enrollLoading, updateCompleted } = useEnrollees(
+        isReviewer ? id : null
+    );
 
-    const { user, loading } = useUsers();
-
+    const [openJobs, setOpenJobs] = useState({});
 
     const icon = [
         { icon: FaFacebookSquare, size: 20 },
@@ -18,34 +29,43 @@ const ProfileForm = () => {
         { icon: BsLinkedin, size: 19 }
     ]
 
+    const toggleJob = (jobId) => {
+        setOpenJobs((prev) => ({ ...prev, [jobId]: !prev[jobId] }));
+    };
+
+    const getCompletion = (courses) => {
+        if (!courses.length) return 0;
+        const done = courses.filter((c) => c.completed).length;
+        return Math.round((done / courses.length) * 100);
+    };
+
+    const [showCompleteModal, setShowCompleteModal] = useState(false);
+    const [selectedEnrolleeId, setSelectedEnrolleeId] = useState(null);
+
+
     return (
         <>
-            {loading ? (
-                <Spinner loading={loading} />
+        
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 ">
 
-            ) : (
-                <div className="w-full max-w-3xl my-6 ">
+                <div className="w-full my-6 lg:col-span-2">
 
-
-                    <h1 className="text-4xl font-bold text-gray-800 mb-4">
-                        Profile
-                    </h1>
-
-                    <div className="p-6 m-auto mb-4 w-full bg-white border rounded-lg shadow-md">
+                    <div className="p-6 m-auto mb-4 w-full h-full bg-white border rounded-lg shadow-md flex flex-col">
                         <form className="flex flex-col md:flex-row gap-14 items-start">
 
                             <AvatarUpload />
 
 
                             <div className="w-full md:w-2/3 space-y-5">
-                                <div className='my-5'>
+                                <div className='my-2'>
 
-                                    <p className="block text-xl font-semibold mb-1">{user?.display_name}</p>
+                                    <p className="block text-xl font-semibold mb-1">{profile?.display_name}</p>
                                 </div>
                                 <div>
 
                                     <p className="block text-md text-gray-600 font-medium mb-1">
-                                        {user?.bio}
+                                        {profile?.bio}
+
                                     </p>
 
                                 </div>
@@ -63,88 +83,162 @@ const ProfileForm = () => {
 
                             </div>
                         </form>
-                    </div>
+
+                        <div className="px-6 py-6 w-full mt-6">
+
+                            {/* Personal Information */}
+                            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                                Personal Information
+                            </h2>
+
+                            {/* Info Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                                <div>
+                                    <p className="text-sm text-gray-500">Email</p>
+                                    <p className="text-base font-medium text-gray-800">
+                                        {profile?.email}
+                                    </p>
+                                </div>
 
 
+                                <div>
+                                    <p className="text-sm text-gray-500">Employee ID</p>
+                                    <p className="text-base font-medium text-gray-800">
+                                        {profile?.employee_id}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p className="text-sm text-gray-500">Phone</p>
+                                    <p className="text-base font-medium text-gray-800">
+                                        {profile?.phone}
+                                    </p>
+                                </div>
 
 
-                    <div className="px-6 py-6 w-full bg-white border rounded-lg shadow-md mt-6">
-
-                        {/* Personal Information */}
-                        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                            Personal Information
-                        </h2>
-
-                        {/* Info Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-
-                            <div>
-                                <p className="text-sm text-gray-500">Email</p>
-                                <p className="text-base font-medium text-gray-800">
-                                    {user?.email}
-                                </p>
+                                <div>
+                                    <p className="text-sm text-gray-500">Address</p>
+                                    <p className="text-base font-medium text-gray-800">
+                                        {profile?.address}
+                                    </p>
+                                </div>
                             </div>
 
+                            {/* Job Position */}
+                            <h2 className="text-xl font-semibold text-gray-800 mt-8 mb-4">
+                                Company Position
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <p className="text-sm text-gray-500">Department</p>
+                                    <p className="text-base font-medium text-gray-800">
+                                        {profile?.department?.name}
+                                    </p>
+                                </div>
 
-                            <div>
-                                <p className="text-sm text-gray-500">Employee ID</p>
-                                <p className="text-base font-medium text-gray-800">
-                                    {user?.employee_id}
-                                </p>
-                            </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Role</p>
+                                    <p className="text-base font-medium text-gray-800">
+                                        {profile?.job?.title}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Supervisor</p>
+                                    <p className="text-base font-medium text-gray-800">
+                                        {profile?.department?.supervisor?.display_name}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Site</p>
+                                    <p className="text-base font-medium text-gray-800">
+                                        {profile?.job?.company?.location}
+                                    </p>
+                                </div>
 
-                            <div>
-                                <p className="text-sm text-gray-500">Phone</p>
-                                <p className="text-base font-medium text-gray-800">
-                                    {user?.phone}
-                                </p>
                             </div>
-
-
-                            <div>
-                                <p className="text-sm text-gray-500">Address</p>
-                                <p className="text-base font-medium text-gray-800">
-                                    {user?.address}
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Job Position */}
-                        <h2 className="text-xl font-semibold text-gray-800 mt-8 mb-4">
-                            Company Position
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <p className="text-sm text-gray-500">Department</p>
-                                <p className="text-base font-medium text-gray-800">
-                                    {user?.department?.name}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="text-sm text-gray-500">Role</p>
-                                <p className="text-base font-medium text-gray-800">
-                                    {user?.job?.title}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Supervisor</p>
-                                <p className="text-base font-medium text-gray-800">
-                                    {user?.department?.supervisor?.display_name}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Site</p>
-                                <p className="text-base font-medium text-gray-800">
-                                    {user?.job?.company?.location}
-                                </p>
-                            </div>
-
                         </div>
                     </div>
                 </div >
-            )}
+
+                {/* Courses */}
+                <div className="w-full my-6 lg:col-span-3">
+                    <div className="p-6 m-auto mb-4 w-full h-full bg-white border rounded-lg shadow-md">
+                        <div className="my-2 flex gap-3">
+                            <FaBook className="text-lg mt-1 text-[#0F6E56]" />
+                            <p className="block text-xl font-semibold mb-1">Courses Enrolled</p>
+                        </div>
+
+                        {!canViewEnrollments ? (
+                            ''
+                        ) : enrollLoading ? (
+                            <Spinner loading={loading} />
+                        ) : enrollments.length === 0 ? (
+                            <p className="text-sm mt-4 text-gray-400">No courses enrolled yet.</p>
+                        ) : (
+                            enrollments.map(({ jobId, jobTitle, courses }) => {
+                                const completion = getCompletion(courses);
+                                const isOpen = !!openJobs[jobId];
+
+                                return (
+                                    <div key={jobId} className="bg-white p-6 rounded-lg border shadow-md my-6">
+                                        {/* Header */}
+                                        <div
+                                            onClick={() => toggleJob(jobId)}
+                                            className="flex justify-between items-center cursor-pointer"
+                                        >
+                                            <h3 className="text-lg font-bold">{jobTitle}</h3>
+                                            <p className="text-xs text-gray-500 font-semibold text-end">
+                                                {completion}% Complete
+                                            </p>
+                                        </div>
+
+                                        {/* Courses dropdown */}
+                                        <div
+                                            className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "max-h-96 opacity-100 mt-4" : "max-h-0 opacity-0"
+                                                }`}
+                                        >
+                                            {courses.map((course) => (
+                                                <>
+                                                    <div className='flex'>
+
+                                                        <div
+                                                            key={course.courseId}
+                                                            className="flex min-w-xl bg-gray-50 border rounded-lg p-4 my-2 mr-3 shadow-sm hover:bg-gray-100 cursor-pointer"
+                                                        >
+                                                            <p className="font-bold text-gray-800">{course.courseTitle}</p>
+                                                        </div>
+                                                        {(course.completed) ? (
+                                                            <div className='m-auto'>
+                                                                <FaRegCircleCheck className='text-[26px] text-green-700 pb-1' />
+                                                            </div>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => {
+                                                                    setSelectedEnrolleeId(course.enrollmentId)
+                                                                    setShowCompleteModal(true)
+                                                                }}
+                                                                className='m-auto w-40 text-center'>
+                                                                <p className="text-xs font-bold text-gray-500 hover:text-gray-600 cursor-pointer">Mark as Complete</p>
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </>
+                                            ))}
+                                        </div>
+                                    </div >
+                                );
+                            })
+                        )}
+                        {showCompleteModal &&
+                            <CompleteModal
+                                setShowCompleteModal={setShowCompleteModal}
+                                enrolleeId={selectedEnrolleeId}
+                                updateCompleted={updateCompleted} />}
+                    </div>
+                </div>
+
+            </div>
 
         </>
     )
