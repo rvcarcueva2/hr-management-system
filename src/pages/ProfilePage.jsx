@@ -21,7 +21,6 @@ const ProfilePage = () => {
         <>
             <div className=" min-h-175 flex items-start justify-center pt-14 px-30 ">
                 <ProfileForm profile={profile} />
-
             </div>
         </>
     )

@@ -1,21 +1,23 @@
 import { useState, useEffect } from "react";
 import supabase from "../utils/supabaseClient";
 
-const useAvatarUpload = () => {
+const useAvatarUpload = (userId = null) => {
     const [avatarUrl, setAvatarUrl] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Fetch existing avatar on mount
     useEffect(() => {
         const fetchAvatar = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
 
+            // Use the provided userId (viewing someone else) or fall back to logged in user
+            const targetId = userId || user.id;
+
             const { data } = await supabase
                 .from('users')
                 .select('avatar_url')
-                .eq('id', user.id)
+                .eq('id', targetId)
                 .single();
 
             if (data?.avatar_url) {
@@ -24,7 +26,7 @@ const useAvatarUpload = () => {
         };
 
         fetchAvatar();
-    }, []);
+    }, [userId]);
 
     const uploadAvatar = async (file) => {
         if (!file) return;

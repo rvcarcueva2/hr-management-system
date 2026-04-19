@@ -5,7 +5,6 @@ import { Link, useLoaderData } from 'react-router-dom'
 import { FaChevronLeft, FaMapMarker, FaCircle, FaChevronDown, FaCheck } from 'react-icons/fa';
 import ApplyModal from '../components/ApplyModal';
 import useCourses from '../hooks/useCourses';
-import { Button } from '@/components/ui/button';
 import EnrollModal from '@/components/EnrollModal';
 
 const JobPage = () => {
