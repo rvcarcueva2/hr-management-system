@@ -2,7 +2,8 @@ import supabase from '../utils/supabaseClient'
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link, useLoaderData } from 'react-router-dom'
-import { FaChevronLeft, FaMapMarker, FaCircle, FaChevronDown, FaCheck } from 'react-icons/fa';
+import { FaChevronLeft, FaMapMarker, FaCircle, FaChevronDown } from 'react-icons/fa';
+import { FaRegCircleCheck } from "react-icons/fa6";
 import ApplyModal from '../components/ApplyModal';
 import useCourses from '../hooks/useCourses';
 import EnrollModal from '@/components/EnrollModal';
@@ -14,8 +15,8 @@ const JobPage = () => {
     const [showModal, setShowModal] = useState(false);
     const [showLearnDropdown, setShowLearnDropdown] = useState(false);
     const [showEnrollModal, setShowEnrollModal] = useState(false);
-    const [isEnrolled, setIsEnrolled] = useState(false);
 
+    const [isEnrolled, setIsEnrolled] = useState(false);
     useEffect(() => {
         const checkEnrollment = async () => {
             const { data: { session } } = await supabase.auth.getSession()
@@ -37,6 +38,25 @@ const JobPage = () => {
         checkEnrollment()
     }, [courses]) // runs whenever courses load
 
+    const [hasApplied, setHasApplied] = useState(false);
+    useEffect(() => {
+        const checkApplication = async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const userId = session?.user?.id
+            if (!userId) return
+
+            const { data } = await supabase
+                .from("applications")
+                .select("id")
+                .eq("user_id", userId)
+                .eq("job_id", id)
+                .limit(1)
+
+            if (data && data.length > 0) setHasApplied(true)
+        }
+
+        checkApplication()
+    }, [id])
 
     return (
         <>
@@ -62,14 +82,27 @@ const JobPage = () => {
                                         <div className='text-gray-500'>{job.type}</div>
 
                                         <button
-                                            onClick={() => setShowModal(true)}
-                                            className="bg-white  border py-3 px-6 rounded-full hover:shadow-md transition-shadow cursor-pointer"
+                                            onClick={() => !hasApplied && setShowModal(true)}
+                                            className={`border py-3 px-6 rounded-full transition-shadow
+                                                ${hasApplied
+                                                    ? "bg-white text-[#0d624d] cursor-default"
+                                                    : "bg-white hover:shadow-md cursor-pointer"
+                                                }`}
+                                            disabled={hasApplied}
                                         >
-                                            Apply Now
+                                            {hasApplied ? (
+                                                <span className="flex items-center gap-2">
+                                                    <FaRegCircleCheck className='text-[17px]' /> Applied
+                                                </span>
+                                            ) : "Apply Now"}
                                         </button>
 
-                                        {showModal && ( // Only shows true no need a false signature
-                                            <ApplyModal setShowModal={setShowModal} job={job} />
+                                        {showModal && (
+                                            <ApplyModal
+                                                setShowModal={setShowModal}
+                                                job={job}
+                                                onApplySuccess={() => setHasApplied(true)}  //  update instantly on success
+                                            />
                                         )}
 
                                     </div>
@@ -155,13 +188,13 @@ const JobPage = () => {
                                             </button> */}
 
                                             {isEnrolled ? (
-                                                <span className="flex items-center justify-end gap-2 text-[#378ADD] font-medium">
-                                                   <FaCheck className="text-md" /> Enrolled 
+                                                <span className="flex items-center justify-end gap-2 text-[#0d624d] font-medium">
+                                                    <FaRegCircleCheck className="text-md" /> Enrolled
                                                 </span>
                                             ) : (
                                                 <button
                                                     onClick={() => setShowEnrollModal(true)}
-                                                    className="bg-[#378ADD] text-white border py-3 px-5 rounded-full hover:shadow-md transition-shadow cursor-pointer text-sm"
+                                                    className="bg-[#0d624d] text-white border py-3 px-5 rounded-full hover:shadow-md transition-shadow cursor-pointer text-sm"
                                                 >
                                                     Enroll Course
                                                 </button>
