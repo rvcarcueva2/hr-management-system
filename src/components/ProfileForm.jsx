@@ -1,13 +1,15 @@
 import { useState } from 'react'
-import { FaFacebookSquare, FaBook } from "react-icons/fa";
+import { FaBuilding } from "react-icons/fa";
 import { FaRegCircleCheck } from "react-icons/fa6";
-import { PiInstagramLogoFill } from "react-icons/pi";
 import { BsLinkedin } from "react-icons/bs";
+import { AiFillInfoCircle } from "react-icons/ai";
+import { FaUserGraduate } from "react-icons/fa";
 import AvatarUpload from './AvatarUpload';
 import { useParams } from 'react-router-dom'
 import useEnrollees from "../hooks/useEnrollees";
 import useUsers from '@/hooks/useUsers';
 import CompleteModal from './CompleteModal';
+
 
 const ProfileForm = ({ profile }) => {
     const { id } = useParams();
@@ -16,15 +18,11 @@ const ProfileForm = ({ profile }) => {
     const isReviewer = user?.role === 'Reviewer';
     const canViewEnrollments = isOwnProfile || isReviewer;
 
-    const { enrollments, updateCompleted } = useEnrollees(
-        isReviewer ? id : null
-    );
+    const { enrollments, updateCompleted } = useEnrollees(id || null)
 
     const [openJobs, setOpenJobs] = useState({});
 
     const icon = [
-        { icon: FaFacebookSquare, size: 20 },
-        { icon: PiInstagramLogoFill, size: 20 },
         { icon: BsLinkedin, size: 19 }
     ]
 
@@ -77,15 +75,17 @@ const ProfileForm = ({ profile }) => {
                                         )
                                     })}
                                 </ul>
+
                             </div>
                         </form>
-
                         <div className="px-6 py-6 w-full mt-6">
-
                             {/* Personal Information */}
-                            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                                Personal Information
-                            </h2>
+                            <div className='flex gap-3'>
+                                <AiFillInfoCircle className='text-[22px] mt-0.5 text-[#0F6E56]' />
+                                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                                    Personal Information
+                                </h2>
+                            </div>
 
                             {/* Info Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -106,25 +106,26 @@ const ProfileForm = ({ profile }) => {
                                 </div>
 
                                 <div>
-                                    <p className="text-sm text-gray-500">Phone</p>
-                                    <p className="text-base font-medium text-gray-800">
-                                        {profile?.phone}
-                                    </p>
-                                </div>
-
-
-                                <div>
                                     <p className="text-sm text-gray-500">Address</p>
                                     <p className="text-base font-medium text-gray-800">
                                         {profile?.address}
                                     </p>
                                 </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Phone</p>
+                                    <p className="text-base font-medium text-gray-800">
+                                        {profile?.phone}
+                                    </p>
+                                </div>
                             </div>
 
                             {/* Job Position */}
-                            <h2 className="text-xl font-semibold text-gray-800 mt-8 mb-4">
-                                Company Position
-                            </h2>
+                            <div className='flex gap-3 mt-6'>
+                                <FaBuilding className='text-lg mt-1 text-[#0F6E56]' />
+                                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                                    Company Position
+                                </h2>
+                            </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <p className="text-sm text-gray-500">Department</p>
@@ -161,7 +162,7 @@ const ProfileForm = ({ profile }) => {
                 <div className="w-full my-6 lg:col-span-3">
                     <div className="p-6 m-auto mb-4 w-full h-full bg-white border rounded-lg shadow-md">
                         <div className="my-2 flex gap-3">
-                            <FaBook className="text-lg mt-1 text-[#0F6E56]" />
+                            <FaUserGraduate className="text-lg mt-1 text-[#0F6E56]" />
                             <p className="block text-xl font-semibold mb-1">Courses Enrolled</p>
                         </div>
 

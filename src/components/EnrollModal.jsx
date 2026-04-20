@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import { Separator } from './ui/separator'
 import supabase from '../utils/supabaseClient'
+import { useNavigate } from 'react-router-dom'
 import { toast } from "sonner"
 
 const EnrollModal = ({ setShowEnrollModal, courses, jobTitle, onEnrollSuccess }) => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
+
+    const navigate = useNavigate();
 
     const handleConfirm = async () => {
         setLoading(true)
@@ -39,7 +42,11 @@ const EnrollModal = ({ setShowEnrollModal, courses, jobTitle, onEnrollSuccess })
         } finally {
             setLoading(false)
             toast.success('You have successfully enrolled in this course!')
+            navigate('/profile');
+            window.scrollTo(0, 0);
+
         }
+
     }
 
     return (
@@ -71,7 +78,7 @@ const EnrollModal = ({ setShowEnrollModal, courses, jobTitle, onEnrollSuccess })
                         disabled={loading}
                         className="px-5 py-2 text-sm bg-[#378ADD] text-white rounded-full hover:shadow-lg cursor-pointer disabled:opacity-50"
                     >
-                        {loading ? "Enrolling..." : "Confirm"}
+                        Confirm
                     </button>
                     <button
                         onClick={() => setShowEnrollModal(false)}

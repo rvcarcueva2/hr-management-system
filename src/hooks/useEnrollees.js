@@ -82,6 +82,15 @@ const useEnrollees = (targetUserId = null) => {
                 .eq("id", enrolleeId)
 
             if (updateError) throw updateError;
+            // ✅ Update in place — no re-fetch, order stays exactly the same
+            setEnrollments(prev => prev.map(group => ({
+                ...group,
+                courses: group.courses.map(course =>
+                    course.enrollmentId === enrolleeId
+                        ? { ...course, completed: true }
+                        : course
+                )
+            })))
             return true;
         } catch (err) {
             console.log('Error updating status:', err);

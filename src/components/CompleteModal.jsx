@@ -27,11 +27,9 @@ const CompleteModal = ({ setShowCompleteModal, enrolleeId, updateCompleted }) =>
                 </h2>
                 <Separator />
 
-
                 <p className="mt-4 text-sm text-gray-600">
                     Once confirmed this course will be marked as complete. Note that this action cannot be undone.
                 </p>
-
 
                 <div className="flex justify-end gap-2 mt-6">
                     <button
