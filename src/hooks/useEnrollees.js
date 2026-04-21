@@ -33,7 +33,8 @@ const useEnrollees = (targetUserId = null) => {
                             )
                         )
                     `)
-                    .eq("user_id", queryUserId);
+                    .eq("user_id", queryUserId)
+                    .order("id", { ascending: true });
 
                 if (error) throw error;
 
@@ -72,7 +73,6 @@ const useEnrollees = (targetUserId = null) => {
     }, [targetUserId]);
 
     const updateCompleted = async (enrolleeId) => {
-        setLoading(true)
         setError(null)
 
         try {
@@ -96,8 +96,6 @@ const useEnrollees = (targetUserId = null) => {
             console.log('Error updating status:', err);
             setError(err.message)
             return false;
-        } finally {
-            setLoading(false)
         }
     }
 
