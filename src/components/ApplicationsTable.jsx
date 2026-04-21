@@ -234,7 +234,8 @@ function DraggableRow({ row }) {
 function TableCellViewer({ item, table }) {
     const isMobile = useIsMobile()
     const { user } = useUsers()
-    const { updateStatus, assigneeOptions } = useApplications();
+    const updateStatus = table?.options?.meta?.updateStatus;
+    const assigneeOptions = table?.options?.meta?.assigneeOptions ?? [];
     const { createSchedule, updateSchedule, events } = useSchedules(item.id) // pass application id here
     const [status, setStatus] = React.useState(item.status)
     const [open, setOpen] = React.useState(false)
@@ -303,7 +304,7 @@ function TableCellViewer({ item, table }) {
         const templates = {
             Scheduled: {
                 subject: "Your Interview Has Been Scheduled",
-                html: `<h2>Interview Scheduled</h2><p>Hi ${applicantName},</p><p>Your interview for the position of <strong>${extraData.jobTitle}</strong> has been scheduled on <strong>${extraData.date}</strong> from <strong>${extraData.start}</strong> to <strong>${extraData.end}</strong>.</p>${extraData.meetingLink ? `<p>Join the meeting using the link below:</p><p><a href="${extraData.meetingLink}" target="_blank">${extraData.meetingLink}</a></p>` : ''}<p>Please be available at the scheduled time.</p>`,
+                html: `<h2>Interview Scheduled</h2><p>Hi ${applicantName},</p><p>Your interview for the position of <strong>${extraData.jobTitle}</strong> has been scheduled on <strong>${extraData.date}</strong> from <strong>${extraData.start}</strong> to <strong>${extraData.end}</strong>.<p>Your interviewer will be <strong>${extraData.assignedName}</strong>. </p>${extraData.meetingLink ? `<p>Join the meeting using the link below:</p><p><a href="${extraData.meetingLink}" target="_blank">${extraData.meetingLink}</a></p>` : ''}<p>Please be available at the scheduled time.</p>`,
             },
             Accepted: {
                 subject: "Congratulations! Your Application Has Been Accepted",
@@ -357,6 +358,7 @@ function TableCellViewer({ item, table }) {
                         start: buildDateTime(scheduleDate, startTime),
                         end: buildDateTime(scheduleDate, endTime),
                         meetingLink,
+
                     })
                 } else {
                     await createSchedule({
@@ -378,7 +380,7 @@ function TableCellViewer({ item, table }) {
                     item.applicant.email,
                     item.applicant?.display_name ?? 'Applicant',
                     status,
-                    { date: scheduleDate, start: startTime, end: endTime, meetingLink, jobTitle: item.job?.title }
+                    { date: scheduleDate, start: startTime, end: endTime, meetingLink, jobTitle: item.job?.title, assignedName: assigneeOptions.find(u => u.id === assigned)?.display_name ?? null }
                 )
             } catch (e) {
                 toast.warning('Application updated but failed to send email', { id: toastId })
@@ -390,7 +392,7 @@ function TableCellViewer({ item, table }) {
 
         toast.success('Application updated successfully!', { id: toastId })
         setOpen(false)
-        setTimeout(() => window.location.reload(), 1500)
+
     };
 
 
@@ -591,7 +593,7 @@ function TableCellViewer({ item, table }) {
     )
 }
 
-export function DataTable({ data: initialData, autoOpenApplicantName }) {
+export function DataTable({ data: initialData, autoOpenApplicantName, assigneeOptions, updateStatus }) {
     const [selectedTab, setSelectedTab] = React.useState('All');
     const [autoOpenHandled, setAutoOpenHandled] = React.useState(false);
     const filteredData = React.useMemo(() => {
@@ -619,8 +621,11 @@ export function DataTable({ data: initialData, autoOpenApplicantName }) {
 
     React.useEffect(() => {
         setData(filteredData);
-        setPagination(p => ({ ...p, pageIndex: 0 })); // reset to page 1 on tab change
     }, [filteredData]);
+
+    React.useEffect(() => {
+        setPagination(p => ({ ...p, pageIndex: 0 }));
+    }, [selectedTab]);
 
     React.useEffect(() => {
         if (autoOpenApplicantName) {
@@ -638,6 +643,8 @@ export function DataTable({ data: initialData, autoOpenApplicantName }) {
             autoOpenApplicantName,
             autoOpenHandled,
             markAutoOpenHandled: () => setAutoOpenHandled(true),
+            updateStatus,
+            assigneeOptions,
         },
         state: { sorting, columnVisibility, rowSelection, columnFilters, pagination },
         getRowId: (row) => row.id.toString(),
@@ -665,6 +672,7 @@ export function DataTable({ data: initialData, autoOpenApplicantName }) {
             })
         }
     }
+
 
     return (
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full flex-col justify-start gap-6">
