@@ -121,6 +121,54 @@ const useJobs = () => {
         }
     };
 
+    const updateCourses = async (jobId, courses = []) => {
+        try {
+            // Fetch existing courses for comparison
+            const { data: existing, error: fetchError } = await supabase
+                .from('courses')
+                .select('id, title, course_link')
+                .eq('job_id', jobId)
+
+            if (fetchError) throw fetchError
+
+            // Check if anything actually changed
+            const hasChanges =
+                existing.length !== courses.length ||
+                courses.some((c) => {
+                    const match = existing.find(e => e.id === c.id)
+                    return !match || match.title !== c.title || match.course_link !== c.link
+                })
+
+            if (!hasChanges) return true // no changes, skip delete/insert
+
+            // Delete existing courses for this job first
+            const { error: deleteError } = await supabase
+                .from('courses')
+                .delete()
+                .eq('job_id', jobId)
+
+            if (deleteError) throw deleteError
+
+            // Insert new courses if any
+            if (courses.length === 0) return true
+
+            const { error: insertError } = await supabase
+                .from('courses')
+                .insert(courses.map(c => ({
+                    title: c.title,
+                    course_link: c.link,
+                    job_id: jobId
+                })))
+
+            if (insertError) throw insertError
+            return true
+
+        } catch (err) {
+            console.log('Error updating courses:', err)
+            return false
+        }
+    }
+
     const deleteJob = async (jobId) => {
         setLoading(true);
         setError(false);
@@ -142,7 +190,9 @@ const useJobs = () => {
         }
     };
 
-    return { jobs, loading, submitting, error, fetchJobs, submitJob, updateJob, deleteJob }
+
+
+    return { jobs, loading, submitting, error, fetchJobs, submitJob, updateCourses, updateJob, deleteJob, }
 }
 
 
