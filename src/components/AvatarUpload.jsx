@@ -1,6 +1,7 @@
 import useAvatarUpload from "../hooks/useAvatarUpload";
+import { cn } from "../lib/utils";
 
-const AvatarUpload = ({ userId, isViewOnly = false }) => {
+const AvatarUpload = ({ userId, isViewOnly = false, className }) => {
     const { avatarUrl, uploading, error, uploadAvatar } = useAvatarUpload(userId);
 
     const handleUpload = (e) => {
@@ -10,7 +11,12 @@ const AvatarUpload = ({ userId, isViewOnly = false }) => {
 
     return (
         <div className="flex flex-col items-center gap-4 w-full md:w-1/3">
-            <div className="w-32 h-32 border rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+            <div
+                className={cn(
+                    "w-32 h-32 border rounded-full bg-gray-200 overflow-hidden flex items-center justify-center",
+                    className
+                )}
+            >
                 {avatarUrl ? (
                     <img
                         src={avatarUrl}
