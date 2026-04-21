@@ -448,12 +448,11 @@ export function DataTable({ data: initialData }) {
     const columns = React.useMemo(() => getColumns(setDeleteModal), [setDeleteModal])
 
     const handleDelete = async () => {
-        const toastId = toast.loading('Deleting application...')
         if (!deleteModal.applicationId) {
             toast.error('No application selected')
             return
         }
-        const success = await deleteApplication(deleteModal.applicationId, { id: toastId })
+        const success = await deleteApplication(deleteModal.applicationId)
         if (!success) {
             toast.error('Failed to delete application')
             return
