@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom";
 import useUsers from "@/hooks/useUsers";
 import useAvatarUpload from "@/hooks/useAvatarUpload";
 import { FaPaperclip } from "react-icons/fa6";
@@ -8,7 +9,7 @@ import { toast } from 'sonner'
 
 
 
-const ApplyModal = ({ setShowModal, job }) => { // Props from JobPage
+const ApplyModal = ({ setShowModal, job, onApplySuccess }) => { // Props from JobPage
     const { user, loading } = useUsers();
     const { avatarUrl } = useAvatarUpload();
     const [step, setStep] = useState(1);
@@ -18,6 +19,8 @@ const ApplyModal = ({ setShowModal, job }) => { // Props from JobPage
     const [resumeError, setResumeError] = useState(false);
     const [coverLetterFile, setCoverLetterFile] = useState(null);
     const [coverLetterError, setCoverLetterError] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleSubmit = async () => {
 
@@ -42,10 +45,14 @@ const ApplyModal = ({ setShowModal, job }) => { // Props from JobPage
         }
 
         toast.success('Application submitted successfully!', { id: toastId })
+        onApplySuccess?.()
         setShowModal(false);
+        setTimeout(() => {
+            navigate('/my-application');
+        }, 1500);
     };
 
-    
+
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
