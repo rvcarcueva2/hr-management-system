@@ -125,7 +125,7 @@ const AdminNavBar = () => {
                                     </div>
 
                                     <div
-                                        className={`absolute right-0 px-2 py-2 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 transition-all duration-200 ease-out origin-top overflow-hidden
+                                        className={`absolute right-0 px-2 py-2 mt-2 w-84 bg-white border border-gray-200 rounded-xl shadow-xl z-50 transition-all duration-200 ease-out origin-top overflow-hidden
                                             ${showNotificaiton
                                                 ? "opacity-100 scale-100 translate-y-0"
                                                 : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
@@ -155,10 +155,10 @@ const AdminNavBar = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm ">
-                                                            {item.type === "assigned" ? "New assigned application" : "You have a new application"}
+                                                            {item.type === "assigned" ? "You are assigned to an application" : "You receive a new application"}
                                                         </p>
                                                         <p className="text-xs text-gray-500 mt-1 ">
-                                                            {item.applicantName} | {formatTimeAgo(item.time)}
+                                                            {item.applicantName} • {formatTimeAgo(item.time)}
                                                         </p>
                                                     </div>
                                                 </div>
