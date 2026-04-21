@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { FaBuilding } from "react-icons/fa";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { BsLinkedin } from "react-icons/bs";
+import { IoMdMail } from "react-icons/io";
 import { AiFillInfoCircle } from "react-icons/ai";
 import { FaUserGraduate } from "react-icons/fa";
 import AvatarUpload from './AvatarUpload';
@@ -23,7 +24,8 @@ const ProfileForm = ({ profile }) => {
     const [openJobs, setOpenJobs] = useState({});
 
     const icon = [
-        { icon: BsLinkedin, size: 19 }
+        { icon: BsLinkedin, size: 18 },
+        { icon: IoMdMail, size: 20, link: `mailto:${profile?.email}` }
     ]
 
     const toggleJob = (jobId) => {
@@ -54,15 +56,13 @@ const ProfileForm = ({ profile }) => {
                     <div className="p-6 m-auto mb-4 w-full h-full bg-white border rounded-lg shadow-md flex flex-col">
                         <form className="flex flex-col md:flex-row gap-14 items-start">
                             <AvatarUpload userId={id || user?.id} isViewOnly={isViewOnly} />
-                            <div className="w-full md:w-2/3 space-y-5">
+                            <div className="w-full space-y-5">
                                 <div className='my-2'>
-
                                     <p className="block text-xl font-semibold mb-1">{profile?.display_name}</p>
                                 </div>
                                 <div>
                                     <p className="block text-md text-gray-600 font-medium mb-1">
                                         {profile?.bio}
-
                                     </p>
                                 </div>
                                 <ul className='flex gap-2'>
@@ -70,7 +70,9 @@ const ProfileForm = ({ profile }) => {
                                         const Icon = item.icon
                                         return (
                                             <li key={index} className='border rounded-full p-2'>
-                                                <Icon size={item.size} className='text-gray-600' />
+                                                <a href={item.link}>
+                                                    <Icon size={item.size} className='text-gray-600' />
+                                                </a>
                                             </li>
                                         )
                                     })}
