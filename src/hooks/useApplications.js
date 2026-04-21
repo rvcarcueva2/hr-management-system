@@ -28,6 +28,7 @@ const useApplications = () => {
                         )
                     ),
                     applicant:users!applications_user_id_fkey (
+                        id,
                         employee_id,
                         email,
                         display_name
@@ -66,7 +67,6 @@ const useApplications = () => {
 
     // Updating an Application
     const updateStatus = async (applicationId, status, reviewerId, assignedId) => {
-        setLoading(true);
         setError(null);
         try {
             const { error: updateError } = await supabase
@@ -80,13 +80,24 @@ const useApplications = () => {
 
             if (updateError) throw updateError;
 
+            // Update in place no re - fetch needed
+            setApplications(prev => prev.map(app =>
+                app.id === applicationId
+                    ? {
+                        ...app,
+                        status,
+                        ...(reviewerId && { reviewer: assigneeOptions.find(u => u.id === reviewerId) }),
+                        ...(assignedId && { assigned: assigneeOptions.find(u => u.id === assignedId) }),
+                    }
+                    : app
+            ));
+
             return true;
+
         } catch (err) {
             console.error("Error updating status:", err);
             setError(err.message);
             return false;
-        } finally {
-            setLoading(false);
         }
     };
 

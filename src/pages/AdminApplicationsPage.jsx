@@ -5,7 +5,7 @@ import useApplications from '../hooks/useApplications';
 import Spinner from '@/components/Spinner';
 
 const AdminApplicationsPage = () => {
-    const { applications, loading, error } = useApplications();
+    const { applications, assigneeOptions, updateStatus, loading, error } = useApplications();
     const [searchParams] = useSearchParams();
     const autoOpenApplicantName = searchParams.get('applicant');
 
@@ -14,7 +14,12 @@ const AdminApplicationsPage = () => {
 
     return (
         <>
-            <DataTable data={applications} autoOpenApplicantName={autoOpenApplicantName} />
+            <DataTable
+                data={applications}
+                assigneeOptions={assigneeOptions}
+                updateStatus={updateStatus}
+                autoOpenApplicantName={autoOpenApplicantName}
+            />
         </>
     )
 }
