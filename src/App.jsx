@@ -1,5 +1,5 @@
 import './index.css'
-import { useState, lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
 import Spinner from './components/Spinner';
 
@@ -14,6 +14,7 @@ const HomePage = lazy(() => import('./pages/HomePage'))
 const JobsPage = lazy(() => import('./pages/JobsPage'))
 const JobPage = lazy(() => import('./pages/JobPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
+const MyApplicationPage = lazy(() => import('./pages/MyApplicationPage'))
 
 const AdminPage = lazy(() => import('./pages/AdminDashboardPage'))
 const AdminApplicationsPage = lazy(() => import('./pages/AdminApplicationsPage'))
@@ -32,8 +33,12 @@ const jobLoader = async (args) => {
   return module.jobLoader(args)
 }
 
+const profileLoader = async (args) => {
+  const module = await import('./pages/ProfilePage')
+  return module.profileLoader(args)
+}
+
 function App() {
-  const [loading, setLoading] = useState(true);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -42,8 +47,9 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path='jobs' element={<JobsPage />} />
           <Route path='jobs/:id' element={<JobPage />} loader={jobLoader} />
-          <Route path='profile' element={<ProfilePage />} />
-
+          <Route path='profile' element={<ProfilePage />} loader={profileLoader} />
+          <Route path='profile/:id' element={<ProfilePage />} loader={profileLoader} />
+          <Route path='my-application' element={<MyApplicationPage />} />
           <Route path='*' element={<NotFoundPage />} />
 
         </Route>
