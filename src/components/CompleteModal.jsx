@@ -17,7 +17,6 @@ const CompleteModal = ({ setShowCompleteModal, enrolleeId, updateCompleted }) =>
             toast.error("Something went wrong. Please try again.")
         }
 
-        setTimeout(() => window.location.reload(), 1500)
     }
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 supports-backdrop-filter:backdrop-blur-xs">
