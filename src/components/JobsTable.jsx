@@ -28,7 +28,8 @@ import {
     IconLayoutColumns,
     IconPlus,
     IconTrashFilled,
-    IconRefresh
+    IconRefresh,
+    IconX
 } from "@tabler/icons-react"
 import {
     flexRender,
@@ -98,6 +99,7 @@ import {
 } from "@/components/ui/card"
 
 import useJobs from "@/hooks/useJobs"
+import useCourses from "@/hooks/useCourses"
 
 
 
@@ -246,29 +248,60 @@ function DraggableRow({ row }) {
 
 function TableCellViewer({ item }) {
     const isMobile = useIsMobile()
-    const { updateJob } = useJobs()
+    const { updateJob, updateCourses } = useJobs()
     const [open, setOpen] = React.useState(false)
     const [title, setTitle] = React.useState(item.title);
     const [type, setType] = React.useState(item.type);
     const [category, setCategory] = React.useState(item.category);
     const [salary, setSalary] = React.useState(item.salary);
     const [description, setDescription] = React.useState(item.description);
+    const [courses, setCourses] = React.useState([]);
+    const { courses: existingCourses, loading: coursesLoading } = useCourses(item.id)
+    React.useEffect(() => {
+        if (coursesLoading) return  // ✅ wait until fetch is done
+        if (existingCourses.length === 0) return
+
+        setCourses(existingCourses.map(c => ({
+            id: c.id,
+            title: c.title,
+            link: c.course_link,
+        })))
+    }, [coursesLoading])
+
+    const addCourse = () => {
+        setCourses(prev => [...prev, { id: Date.now(), title: "", link: "" }])
+    }
+
+    const updateCourse = (id, field, value) => {
+        setCourses(prev => prev.map(c => c.id === id ? { ...c, [field]: value } : c))
+    }
+
+
+    const removeCourse = (id) => {
+        setCourses(prev => prev.filter(c => c.id !== id))
+    }
 
     const handleSubmit = async () => {
-        const toastId = toast.loading('Updating application')
-        const success = await updateJob(item.id, title, type, category, salary, description)
+        const toastId = toast.loading('Updating job...')
 
-        if (!success) {
-            toast.error('Failed to update application', { id: toastId })
+        const jobSuccess = await updateJob(item.id, title, type, category, salary, description)
+
+        if (!jobSuccess) {
+            toast.error('Failed to update job', { id: toastId })
             return
         }
-        toast.success('Application updated successfully!', { id: toastId })
 
+        const validCourses = courses.filter(c => c.title?.trim() && c.link?.trim())
+        const coursesSuccess = await updateCourses(item.id, validCourses)
+
+        if (!coursesSuccess) {
+            toast.error('Job updated but failed to save courses', { id: toastId })
+            return
+        }
+
+        toast.success('Job updated successfully!', { id: toastId })
         setOpen(false)
-
-        setTimeout(() => {
-            window.location.reload()
-        }, 1500)
+        setTimeout(() => window.location.reload(), 1500)
     }
 
 
@@ -390,6 +423,44 @@ function TableCellViewer({ item }) {
                         <div className="flex flex-col gap-3">
                             <Label htmlFor="job_id">Job ID</Label>
                             <Input defaultValue={item.id ?? 'No Result'} className={`cursor-default`} readOnly />
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label>Courses</Label>
+
+                            {courses.map((course) => (
+                                <div key={course.id} className="flex gap-2 items-center">
+                                    <Input
+                                        placeholder="Course title"
+                                        value={course.title}
+                                        onChange={(e) => updateCourse(course.id, "title", e.target.value)}
+                                        className={`bg-white border border-gray-200`}
+
+                                    />
+                                    <Input
+                                        placeholder="Course link"
+                                        value={course.link}
+                                        onChange={(e) => updateCourse(course.id, "link", e.target.value)}
+                                        className={`bg-white border border-gray-200`}
+                                    />
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => removeCourse(course.id)}
+                                        className="shrink-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer"
+                                    >
+                                        <IconX className="size-4" />
+                                    </Button>
+                                </div>
+                            ))}
+
+                            <Button
+                                variant="outline"
+                                onClick={addCourse}
+                                className="w-full border-dashed cursor-pointer hover:border-[#378ADD] text-gray-600 hover:text-[#378ADD]"
+                            >
+                                <IconPlus className="size-4 mr-2" /> Add Course
+                            </Button>
                         </div>
                     </div>
                 </div>
