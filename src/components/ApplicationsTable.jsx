@@ -91,7 +91,6 @@ import {
 import { CalendarWithTime } from "@/components/CalendarWithTime"
 import { useSchedules } from "@/hooks/useSchedules"
 import useStorageUrl from '@/hooks/useStorageUrl'
-import useApply from "@/hooks/useApply"
 import useUsers from "@/hooks/useUsers"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import useApplications from "@/hooks/useApplications"
@@ -151,7 +150,7 @@ const columns = [
     {
         accessorKey: "applicant",
         header: "Applicant",
-        cell: ({ row }) => <TableCellViewer item={row.original} />,
+        cell: ({ row, table }) => <TableCellViewer item={row.original} table={table} />,
         enableHiding: false,
     },
     {
@@ -232,7 +231,7 @@ function DraggableRow({ row }) {
     )
 }
 
-function TableCellViewer({ item }) {
+function TableCellViewer({ item, table }) {
     const isMobile = useIsMobile()
     const { user } = useUsers()
     const { updateStatus, assigneeOptions } = useApplications();
@@ -240,6 +239,9 @@ function TableCellViewer({ item }) {
     const [status, setStatus] = React.useState(item.status)
     const [open, setOpen] = React.useState(false)
     const { getPublicUrl } = useStorageUrl('applications')
+    const autoOpenApplicantName = table?.options?.meta?.autoOpenApplicantName ?? null
+    const autoOpenHandled = table?.options?.meta?.autoOpenHandled ?? false
+    const markAutoOpenHandled = table?.options?.meta?.markAutoOpenHandled
 
     const [scheduleOpen, setScheduleOpen] = React.useState(false)
     const [scheduleDate, setScheduleDate] = React.useState(null)
@@ -278,6 +280,17 @@ function TableCellViewer({ item }) {
             setEndTime(end.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }))
         }
     }, [events]);
+
+    React.useEffect(() => {
+        if (!autoOpenApplicantName || autoOpenHandled) return;
+        const applicantName = item.applicant?.display_name ?? "";
+        if (applicantName.toLowerCase() === autoOpenApplicantName.toLowerCase()) {
+            setOpen(true);
+            if (typeof markAutoOpenHandled === "function") {
+                markAutoOpenHandled();
+            }
+        }
+    }, [autoOpenApplicantName, autoOpenHandled, item.applicant?.display_name, markAutoOpenHandled]);
 
     const buildDateTime = (date, timeStr) => {
         const [hours, minutes, seconds] = timeStr.split(':')
@@ -391,12 +404,14 @@ function TableCellViewer({ item }) {
             <DrawerContent>
                 <DrawerHeader className="gap-1">
                     <DrawerTitle>{item.applicant?.employee_id ?? 'N/A'}</DrawerTitle>
-                    <div className="flex gap-2 leading-none font-medium">
+                    <div className="flex gap-2 leading-none ">
                         {item.applicant?.display_name}
                     </div>
-                    <div className="flex gap-2 leading-none text-muted-foreground">
+
+                    <a href={`/profile/${item.applicant?.id}`} target="_blank" className="flex gap-2 leading-none text-muted-foreground hover:underline">
                         {item.applicant?.email}
-                    </div>
+                    </a>
+
                 </DrawerHeader>
                 <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent">
                     {!isMobile && (
@@ -576,8 +591,9 @@ function TableCellViewer({ item }) {
     )
 }
 
-export function DataTable({ data: initialData }) {
+export function DataTable({ data: initialData, autoOpenApplicantName }) {
     const [selectedTab, setSelectedTab] = React.useState('All');
+    const [autoOpenHandled, setAutoOpenHandled] = React.useState(false);
     const filteredData = React.useMemo(() => {
         if (selectedTab === 'All') return initialData;
         return initialData.filter(row => row.status === selectedTab);
@@ -606,11 +622,23 @@ export function DataTable({ data: initialData }) {
         setPagination(p => ({ ...p, pageIndex: 0 })); // reset to page 1 on tab change
     }, [filteredData]);
 
+    React.useEffect(() => {
+        if (autoOpenApplicantName) {
+            setSelectedTab('All');
+            setAutoOpenHandled(false);
+        }
+    }, [autoOpenApplicantName]);
+
 
 
     const table = useReactTable({
         data,
         columns,
+        meta: {
+            autoOpenApplicantName,
+            autoOpenHandled,
+            markAutoOpenHandled: () => setAutoOpenHandled(true),
+        },
         state: { sorting, columnVisibility, rowSelection, columnFilters, pagination },
         getRowId: (row) => row.id.toString(),
         enableRowSelection: true,
