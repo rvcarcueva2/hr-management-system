@@ -26,13 +26,15 @@ import {
 } from '@/components/ui/drawer'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { Separator } from "@/components/ui/separator"
+import useUsers from '@/hooks/useUsers'
 
 export default function ScheduleCalendar({ applicationId }) {
   const calendarRef = useRef(null)
   const [currentViewType, setCurrentViewType] = useState('dayGridMonth')
-  const [currentTitle, setCurrentTitle] = useState('')
+  const { user, loading: userLoading } = useUsers();
   const { events, loading, error, createSchedule } = useSchedules(applicationId)
   const [calendarInfo, setCalendarInfo] = useState({ open: false, event: null })
+  const [currentTitle, setCurrentTitle] = useState('')
   const isMobile = useIsMobile()
 
   const getInitials = (name) => {

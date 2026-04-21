@@ -1,12 +1,22 @@
 import { useEffect, useState, useCallback } from 'react'
 import supabase from '../utils/supabaseClient';
 
-export function useSchedules(applicationId) {
+
+export function useSchedules(applicationId) {  // ✅ remove userId param
     const [events, setEvents] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
     const fetchSchedules = useCallback(async () => {
+        // ✅ Get userId directly from session — always available
+        const { data: { session } } = await supabase.auth.getSession()
+        const userId = session?.user?.id
+
+        if (!applicationId && !userId) {
+            setLoading(false)
+            return
+        }
+
         setLoading(true)
         setError(null)
 
@@ -14,20 +24,19 @@ export function useSchedules(applicationId) {
             .from('schedules')
             .select(`id, title, application_id, start_time, end_time, meeting_link,
                 application:application_id (
-                user:user_id (
-                    employee_id,
-                    display_name,
-                    avatar_url
-                ),
-                assigned:users!applications_assigned_fkey (
-                display_name,
-                avatar_url
-                )
-            ) `)
+                    user:user_id (
+                        employee_id,
+                        display_name,
+                        avatar_url
+                    ),
+                    assigned:users!applications_assigned_fkey (
+                        id,
+                        display_name,
+                        avatar_url
+                    )
+                )`)
             .order('start_time', { ascending: true })
 
-        // If an applicationId is provided, limit schedules to that application.
-        // If not, return schedules for all applications (used in the Admin calendar).
         if (applicationId) {
             query = query.eq('application_id', applicationId)
         }
@@ -37,7 +46,11 @@ export function useSchedules(applicationId) {
         if (error) {
             setError(error.message)
         } else {
-            setEvents(data.map(toFCEvent))
+            const filtered = applicationId
+                ? data
+                : data.filter(row => row.application?.assigned?.id === userId) // ✅ userId is guaranteed here
+
+            setEvents(filtered.map(toFCEvent))
         }
 
         setLoading(false)
@@ -45,7 +58,7 @@ export function useSchedules(applicationId) {
 
     useEffect(() => {
         fetchSchedules()
-    }, [applicationId, fetchSchedules])
+    }, [fetchSchedules])
 
     const createSchedule = async ({ title, start, end, meetingLink }) => {
         if (!applicationId) {
