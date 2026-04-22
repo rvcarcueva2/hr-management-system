@@ -180,7 +180,7 @@ const AdminNavBar = () => {
                                 </div>
 
                                 <div className="relative inline-block text-left">
-
+                                    {/* User Profile */}
                                     <div
 
                                         onClick={() => setShowDropdown(prev => !prev)}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaBuilding } from "react-icons/fa";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { BsLinkedin } from "react-icons/bs";
@@ -17,7 +17,8 @@ const ProfileForm = ({ profile }) => {
     const { user } = useUsers();
     const isOwnProfile = user?.id === id;
     const isReviewer = user?.role === 'Reviewer';
-    const canViewEnrollments = isOwnProfile || isReviewer;
+    const isMentor = user?.role === 'Mentor';
+    const canViewEnrollments = isOwnProfile || isReviewer || isMentor;
 
     const { enrollments, updateCompleted } = useEnrollees(id || null)
 
@@ -44,8 +45,6 @@ const ProfileForm = ({ profile }) => {
     const isViewOnly = !!id && user?.id !== id;
 
 
-
-
     return (
         <>
 
@@ -55,7 +54,14 @@ const ProfileForm = ({ profile }) => {
 
                     <div className="p-6 m-auto mb-4 w-full h-full bg-white border rounded-lg shadow-md flex flex-col">
                         <form className="flex flex-col md:flex-row gap-14 items-start">
-                            <AvatarUpload userId={id || user?.id} isViewOnly={isViewOnly} />
+                            {/* Profile Avatar */}
+                            <AvatarUpload
+                                userId={id || user?.id}
+                                isViewOnly={isViewOnly}
+                                avatarUrl={profile?.avatar_url}
+                                alt={profile?.display_name || 'Avatar'}
+                            />
+                            
                             <div className="w-full space-y-5">
                                 <div className='my-2'>
                                     <p className="block text-xl font-semibold mb-1">{profile?.display_name}</p>
