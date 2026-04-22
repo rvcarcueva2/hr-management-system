@@ -1,27 +1,35 @@
+import Image from '../assets/images/hero-image.png'
 
 const Hero = () => {
     return (
-        <>
-            {/* <!-- Hero --> */}
-            
-                <section className=" bg-white py-20 mt-0.5 mb-10">
-                    <div
-                        className="max-w-7xl h-48 mx-auto px-4 sm:px-6 lg:px-10 flex flex-col items-center"
-                    >
-                        <div className="text-center my-auto">
-                            <h1
-                                className="text-4xl font-extrabold text-black sm:text-5xl md:text-4xl"
-                            >
-                                Where recruiting made <span className="text-[#0d624d]">Ease</span>
-                            </h1>
-                            <p className="my-4 text-lg text-gray-600 font-medium">
-                                We transition talents from bigger and better pots
-                            </p>
-                        </div>
+        <section className="bg-white h-100 py-20 mb-10 mt-0.5 ">
+            <div className="max-w-7xl  my-10 mx-auto px-10">
+
+                <div className="flex items-center justify-between gap-10">
+
+                    {/* LEFT: TEXT */}
+                    <div className="max-w-xl ">
+                        <h1 className="text-4xl -mt-14 font-extrabold text-black">
+                            Where recruiting made <span className="text-[#0d624d]">Ease</span>
+                        </h1>
+                        <p className="mt-4 text-lg text-gray-600 font-medium">
+                            We transition talents from bigger and better pots
+                        </p>
                     </div>
-                </section>
-            
-        </>
+
+                    
+                    <div className="shrink-0">
+                        <img
+                            src={Image}
+                            alt="hero-image"
+                            className="w-100 scale-190 -mt-12 "
+                        />
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
     )
 }
 
