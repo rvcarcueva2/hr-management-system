@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import Logo from '../assets/images/recruitease_logo.svg'
 import useAuth from '../hooks/useAuth'
+import useUsers from '../hooks/useUsers'
 import { FaChevronDown, FaUser } from 'react-icons/fa6'
 import { IoMdDocument } from "react-icons/io";
 import { IoIosSettings } from "react-icons/io";
@@ -13,7 +14,8 @@ import { BsBarChartFill } from "react-icons/bs";
 
 const Navbar = () => {
 
-    const { user, logout } = useAuth()
+    const { logout } = useAuth()
+    const { user: currentUser } = useUsers()
     const navigate = useNavigate()
     const [showDropdown, setShowDropdown] = useState(false);
 
@@ -63,7 +65,7 @@ const Navbar = () => {
                                 <NavLink to="/jobs" className="text-gray-600 hover:text-black rounded-md px-3 py-2">
                                     Jobs
                                 </NavLink>
-                                <NavLink to="/about" className="text-gray-600 hover:text-black rounded-md px-3 py-2">
+                                <NavLink to="/mentors" className="text-gray-600 hover:text-black rounded-md px-3 py-2">
                                     Mentors
                                 </NavLink>
                                 <NavLink to="/about" className="text-gray-600 hover:text-black rounded-md px-3 py-2">
@@ -72,7 +74,7 @@ const Navbar = () => {
                             </div>
                         </div>
                         <div className="flex items-center gap-2 mt-2 ml-8">
-                            {user ? (
+                            {currentUser ? (
                                 <>
                                     <div className="relative inline-block">
 
@@ -85,7 +87,7 @@ const Navbar = () => {
                                             className="flex items-center gap-2 cursor-pointer"
                                         >
                                             <span className="text-[#0F6E56] font-medium">
-                                                {user?.user_metadata.display_name}
+                                                {currentUser?.display_name}
                                             </span>
 
                                             <FaChevronDown
