@@ -1,8 +1,17 @@
 import useAvatarUpload from "../hooks/useAvatarUpload";
 import { cn } from "../lib/utils";
 
-const AvatarUpload = ({ userId, isViewOnly = false, className }) => {
+const AvatarUpload = ({
+    userId,
+    isViewOnly = false,
+    className,
+    wrapperClassName,
+    avatarUrl: providedAvatarUrl,
+    alt = "Avatar",
+}) => {
     const { avatarUrl, uploading, error, uploadAvatar } = useAvatarUpload(userId);
+    // Prefer an immediate, parent-provided URL while the hook fetches the latest avatar.
+    const displayAvatarUrl = providedAvatarUrl || avatarUrl;
 
     const handleUpload = (e) => {
         const file = e.target.files[0];
@@ -10,17 +19,22 @@ const AvatarUpload = ({ userId, isViewOnly = false, className }) => {
     };
 
     return (
-        <div className="flex flex-col items-center gap-4 w-full md:w-1/3">
+        <div
+            className={cn(
+                "flex flex-col items-center gap-4 w-full md:w-1/3",
+                wrapperClassName
+            )}
+        >
             <div
                 className={cn(
                     "w-32 h-32 border rounded-full bg-gray-200 overflow-hidden flex items-center justify-center",
                     className
                 )}
             >
-                {avatarUrl ? (
+                {displayAvatarUrl ? (
                     <img
-                        src={avatarUrl}
-                        alt="Avatar"
+                        src={displayAvatarUrl}
+                        alt={alt}
                         className="w-full h-full object-cover"
                     />
                 ) : (

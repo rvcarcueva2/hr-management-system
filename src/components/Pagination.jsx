@@ -17,7 +17,7 @@ const Pagination = ({ totalPosts, postsPerPage, setCurrentPage, currentPage }) =
                         setCurrentPage(page) // Sets the current page to parameter(page:number)
                         window.scrollTo({ top: 0, behavior: 'smooth' }) // parent container needs to have h-screen to work
                     }}
-                    className={`w-9 h-9  border border-[#0d624d]/70 rounded-xl text-sm font-semibold  transition-colors duration-200 focus:outline-none 
+                    className={`w-9 h-9  border border-[#0d624d]/70 rounded-xl text-sm font-semibold  transition-colors duration-200 focus:outline-none cursor-pointer
                         ${currentPage === page
                             ? 'bg-[#0d624d] text-white'
                             : 'text-[#0d624d] hover:bg-[#0d624d] hover:text-white'

@@ -13,6 +13,7 @@ import AuthLayout from './layouts/AuthLayout'
 const HomePage = lazy(() => import('./pages/HomePage'))
 const JobsPage = lazy(() => import('./pages/JobsPage'))
 const JobPage = lazy(() => import('./pages/JobPage'))
+const MentorsPage = lazy(() => import('./pages/MentorsPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const MyApplicationPage = lazy(() => import('./pages/MyApplicationPage'))
 
@@ -47,6 +48,7 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path='jobs' element={<JobsPage />} />
           <Route path='jobs/:id' element={<JobPage />} loader={jobLoader} />
+          <Route path='mentors' element={<MentorsPage />} />
           <Route path='profile' element={<ProfilePage />} loader={profileLoader} />
           <Route path='profile/:id' element={<ProfilePage />} loader={profileLoader} />
           <Route path='my-application' element={<MyApplicationPage />} />
