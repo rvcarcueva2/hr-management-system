@@ -4,6 +4,7 @@ import JobListings from '../components/JobListings'
 import MentorListings from '@/components/MentorListings'
 import ViewAllJobsButton from '../components/ViewAllJobsButton'
 import ViewAllMentorsButton from '@/components/ViewAllMentorsButton'
+import ApplyMentor from '@/components/ApplyMentor'
 
 
 const HomePage = () => {
@@ -18,6 +19,7 @@ const HomePage = () => {
                 <ViewAllJobsButton />
                 <MentorListings isHome={true} />
                 <ViewAllMentorsButton />
+                <ApplyMentor />
             </div>
         </>
     )

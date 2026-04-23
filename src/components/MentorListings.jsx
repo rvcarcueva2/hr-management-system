@@ -74,7 +74,7 @@ const MentorListings = ({ isHome = false }) => {
 
                     {/* Title */}
                     <h2 className={`${isHome ? 'text-3xl' : 'text-5xl'} font-bold text-black mb-6 ${isHome ? 'text-center' : 'text-left'}`}>
-                        {isHome ? 'Mentorship' : 'Mentorship Programs'}
+                        {isHome ? 'Mentorships' : 'Mentorship Programs'}
                     </h2>
                     {/* Description */}
                     <p className="mb-4">{isHome ? '' : 'Browse mentors that will guide you through out your journey'}</p>

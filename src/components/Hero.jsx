@@ -8,7 +8,7 @@ const Hero = () => {
                 <div className="flex items-center justify-between gap-10">
 
                     {/* LEFT: TEXT */}
-                    <div className="max-w-xl ">
+                    <div className="max-w-xl m-auto">
                         <h1 className="text-4xl -mt-14 font-extrabold text-black">
                             Where recruiting made <span className="text-[#0d624d]">Ease</span>
                         </h1>
@@ -18,7 +18,7 @@ const Hero = () => {
                     </div>
 
                     
-                    <div className="shrink-0">
+                    <div className="shrink-0 m-auto">
                         <img
                             src={Image}
                             alt="hero-image"
