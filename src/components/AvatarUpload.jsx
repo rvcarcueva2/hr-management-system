@@ -38,7 +38,7 @@ const AvatarUpload = ({
                         className="w-full h-full object-cover"
                     />
                 ) : (
-                    <span className="text-gray-500 text-sm">No Image</span>
+                    <span className="text-gray-500 text-sm"></span>
                 )}
             </div>
 

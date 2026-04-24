@@ -135,7 +135,7 @@ const ApplyModal = ({ setShowModal, job, onApplySuccess }) => { // Props from Jo
                                                 <textarea
                                                     className="w-full px-4 py-1 text-sm text-gray-500 focus:outline-none resize-none cursor-default"
                                                     rows={2}
-                                                    defaultValue={user?.job.company?.location ?? ""}
+                                                    defaultValue={user?.job?.site ?? ""}
                                                     readOnly
                                                 />
                                             </form>

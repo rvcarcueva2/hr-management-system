@@ -157,7 +157,7 @@ const ProfileForm = ({ profile }) => {
                                 <div>
                                     <p className="text-sm text-gray-500">Site</p>
                                     <p className="text-base font-medium text-gray-800">
-                                        {profile?.job?.company?.location}
+                                        {profile?.job?.site}
                                     </p>
                                 </div>
 
