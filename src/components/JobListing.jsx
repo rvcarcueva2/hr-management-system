@@ -35,7 +35,7 @@ const JobListing = ({ job }) => {
                     <div className="flex flex-col lg:flex-row justify-between mb-4">
                         <div className="text-[#8b5033] mb-3 flex">
                             <FaMapMarker className='mx-2' />
-                            <p className='-mt-0.5'>{job.companies?.location}</p>
+                            <p className='-mt-0.5'>{job.site}</p>
                         </div>
                         <a
                             href={`/jobs/${job.id}`}

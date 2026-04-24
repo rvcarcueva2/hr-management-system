@@ -164,7 +164,7 @@ const columns = [
         accessorKey: "site",
         header: "Site",
         cell: ({ row }) => (
-            <span>{row.original.job?.company?.location ?? 'N/A'}</span>
+            <span>{row.original.job?.site ?? 'N/A'}</span>
         ),
     },
     {
@@ -460,7 +460,7 @@ function TableCellViewer({ item, table }) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex flex-col gap-3">
                                 <Label>Site</Label>
-                                <Input defaultValue={item.job?.company?.location ?? 'N/A'} className={`cursor-default`} readOnly />
+                                <Input defaultValue={item.job?.site ?? 'N/A'} className={`cursor-default`} readOnly />
                             </div>
                             <div className="flex flex-col gap-3">
                                 <Label htmlFor="status">Status</Label>

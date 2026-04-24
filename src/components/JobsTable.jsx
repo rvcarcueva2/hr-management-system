@@ -183,7 +183,7 @@ const getColumns = (setDeleteModal) => [
         accessorKey: "site",
         header: "Site",
         cell: ({ row }) => (
-            <span>{row.original.companies?.location ?? 'N/A'}</span>
+            <span>{row.original.site ?? 'N/A'}</span>
         ),
     },
     {
@@ -483,7 +483,6 @@ function AddJobDrawer() {
 
     const [formData, setFormData] = useState({
         title: "",
-        company: "",
         salary: "",
         type: "",
         description: "",
@@ -517,7 +516,7 @@ function AddJobDrawer() {
                 category: "",
                 description: "",
                 salary: "",
-                company: "",
+               
             })
 
             toast.success("Job posted successfully")

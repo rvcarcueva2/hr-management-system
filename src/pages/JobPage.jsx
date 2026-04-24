@@ -109,20 +109,15 @@ const JobPage = () => {
 
                                     <h1 className='text-3xl font-bold mb-3'>{job.title}</h1>
                                     <div className='flex items-center'>
-                                        <FaMapMarker className='text-[#378ADD] mr-1 -mt-1' />
-                                        <p className='text-[#378ADD]'>{job.companies?.location}</p>
+                                        <FaMapMarker className='text-[#8b5033] mr-1 -mt-1' />
+                                        <p className='text-[#8b5033]'>{job.site}</p>
                                     </div>
                                 </div>
 
                                 <div className='bg-white p-6 rounded-lg border shadow-md mt-6'>
 
-                                    {/* Company Profile */}
-                                    <div className='flex gap-2'>
-                                        <FaCircle className='text-gray-200 w-10 h-auto -mt-2' />
-                                        <h2 className='text-lg'>{job.companies?.name}</h2>
-                                    </div>
-
-                                    <h3 className='text-[#0d624d] text-lg font-bold mt-6 mb-6'>
+                                    
+                                    <h3 className='text-[#0d624d] text-lg font-bold  mb-6'>
                                         Job Description
                                     </h3>
 
@@ -225,14 +220,7 @@ const JobPage = () => {
 const jobLoader = async ({ params }) => {
     const { data, error } = await supabase
         .from('jobs')
-        .select(`*,
-        companies (
-            name,
-            description,
-            contact_email,
-            contact_phone,
-            location
-        )`)
+        .select(`*`)
         .eq('id', params.id)
         .single()
 

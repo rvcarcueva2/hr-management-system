@@ -47,9 +47,7 @@ const profileLoader = async ({ params }) => {
             job:jobs!users_job_id_fkey (
                 title,
                 salary,
-                company:companies!jobs_company_id_fkey (
-                    location
-                )
+                site
             )`)
         .eq('id', params.id)
         .single()
