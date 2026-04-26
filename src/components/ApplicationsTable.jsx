@@ -93,7 +93,6 @@ import { useSchedules } from "@/hooks/useSchedules"
 import useStorageUrl from '@/hooks/useStorageUrl'
 import useUsers from "@/hooks/useUsers"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import useApplications from "@/hooks/useApplications"
 
 
 const tabs = ['All', 'Pending', 'Scheduled', 'Accepted', 'Rejected'];
