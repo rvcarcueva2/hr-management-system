@@ -13,7 +13,7 @@ const useJobs = () => {
         try {
             const { data } = await supabase
                 .from('jobs')
-                .select(`*, companies(name, description, contact_email, contact_phone, location)`)
+                .select(`*`)
                 .order('created_at', { ascending: false })
                 .order('updated_at', { ascending: false })
 
@@ -52,19 +52,6 @@ const useJobs = () => {
                 throw new Error("User has no job assigned.");
             }
 
-            // 3. Get company_id from that job
-            const { data: jobInfo, error: jobError } = await supabase
-                .from('jobs')
-                .select('company_id')
-                .eq('id', userData.job_id)
-                .single();
-
-            if (jobError) throw jobError;
-
-            if (!jobInfo.company_id) {
-                throw new Error("User's job has no company assigned.");
-            }
-
             // 4. Insert new job
             const { data, error } = await supabase
                 .from('jobs')
@@ -74,13 +61,16 @@ const useJobs = () => {
                     category: jobData.category,
                     description: jobData.description,
                     salary: jobData.salary,
-                    company_id: jobInfo.company_id, //  Auto insert from the company_id
+                    site: jobData.site
                 }])
-                .select(`*, companies(name, description, contact_email, contact_phone, location)`);
+                .select()
+                
 
             if (error) throw error;
 
-            setJobs(prev => [data[0], ...prev]);
+            if (data?.length) {
+                setJobs(prev => [data[0], ...prev]);
+            }
 
             return { success: true, data };
 
@@ -93,7 +83,7 @@ const useJobs = () => {
         }
     };
 
-    const updateJob = async (jobId, title, type, category, salary, description) => {
+    const updateJob = async (jobId, title, type, category, salary, description, site, isVisible) => {
         setLoading(true);
         setError(null);
         try {
@@ -104,7 +94,9 @@ const useJobs = () => {
                     type,
                     category,
                     salary,
-                    description
+                    description,
+                    site,
+                    is_visible: isVisible
                 })
                 .eq("id", jobId)
 

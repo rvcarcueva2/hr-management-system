@@ -23,7 +23,8 @@ const JobListings = ({ isHome = false }) => {
 
     // Filter
     const filteredJobs = useMemo(() => {
-        let processed = jobs;
+        const visibleJobs = jobs.filter((job) => job.is_visible === true);
+        let processed = visibleJobs;
 
         //filter() is an array method used to create a new array containing only the elements that pass a condition.
         if (selectedCategory && selectedCategory !== 'All Categories') {
