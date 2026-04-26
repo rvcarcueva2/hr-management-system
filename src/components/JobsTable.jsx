@@ -44,9 +44,9 @@ import {
 import { toast } from "sonner"
 
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 import {
     Drawer,
     DrawerClose,
@@ -254,7 +254,9 @@ function TableCellViewer({ item }) {
     const [type, setType] = React.useState(item.type);
     const [category, setCategory] = React.useState(item.category);
     const [salary, setSalary] = React.useState(item.salary);
+    const [site, setSite] = React.useState(item.site);
     const [description, setDescription] = React.useState(item.description);
+    const [isVisible, setIsVisible] = React.useState(Boolean(item.is_visible));
     const [courses, setCourses] = React.useState([]);
     const { courses: existingCourses, loading: coursesLoading } = useCourses(item.id)
     React.useEffect(() => {
@@ -284,7 +286,7 @@ function TableCellViewer({ item }) {
     const handleSubmit = async () => {
         const toastId = toast.loading('Updating job...')
 
-        const jobSuccess = await updateJob(item.id, title, type, category, salary, description)
+        const jobSuccess = await updateJob(item.id, title, type, category, salary, description, site, isVisible)
 
         if (!jobSuccess) {
             toast.error('Failed to update job', { id: toastId })
@@ -388,6 +390,12 @@ function TableCellViewer({ item }) {
                             </div>
                         </div>
                         <div className="flex flex-col gap-3">
+                            <Label htmlFor="description">Site</Label>
+                            <Input id="site" value={site} onChange={(e) => setSite(e.target.value)} className={`bg-white border-gray`} />
+                        </div>
+
+
+                        <div className="flex flex-col gap-3">
 
                             <div className="flex flex-col gap-3">
                                 <Label htmlFor="category">Category</Label>
@@ -419,10 +427,6 @@ function TableCellViewer({ item }) {
                                 value={description ?? ""}
                                 onChange={(e) => setDescription(e.target.value)}
                             />
-                        </div>
-                        <div className="flex flex-col gap-3">
-                            <Label htmlFor="job_id">Job ID</Label>
-                            <Input defaultValue={item.id ?? 'No Result'} className={`cursor-default`} readOnly />
                         </div>
 
                         <div className="flex flex-col gap-3">
@@ -462,6 +466,14 @@ function TableCellViewer({ item }) {
                                 <IconPlus className="size-4 mr-2" /> Add Course
                             </Button>
                         </div>
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="job_id">Job ID</Label>
+                            <Input defaultValue={item.id ?? 'No Result'} className={`cursor-default`} readOnly />
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="is_visible">Visible</Label>
+                            <Switch checked={isVisible} onCheckedChange={setIsVisible} />
+                        </div>
                     </div>
                 </div>
                 <DrawerFooter>
@@ -485,6 +497,7 @@ function AddJobDrawer() {
         title: "",
         salary: "",
         type: "",
+        site: "",
         description: "",
     })
 
@@ -505,6 +518,7 @@ function AddJobDrawer() {
             category: formData.category,
             description: formData.description,
             salary: formData.salary,
+            site: formData.site
         }
 
         const result = await submitJob(jobPayload)
@@ -516,7 +530,7 @@ function AddJobDrawer() {
                 category: "",
                 description: "",
                 salary: "",
-               
+                site: ""
             })
 
             toast.success("Job posted successfully")
@@ -537,7 +551,8 @@ function AddJobDrawer() {
         formData.type &&
         formData.category &&
         formData.description &&
-        formData.salary
+        formData.salary &&
+        formData.site
 
     // Add job drawer
     return (
@@ -560,7 +575,7 @@ function AddJobDrawer() {
                         <div className="grid  gap-4">
                             <div className="flex flex-col gap-3">
                                 <Label htmlFor="title">Job Title</Label>
-                                <Input id="title" value={formData.title} onChange={handleChange} />
+                                <Input id="title" value={formData.title} onChange={handleChange} className={`bg-white border-gray`} />
                             </div>
                         </div>
                         <div className="flex flex-col gap-3">
@@ -639,6 +654,10 @@ function AddJobDrawer() {
                                     </SelectContent>
                                 </Select>
                             </div>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="description">Site</Label>
+                            <Input id="site" value={formData.site} onChange={handleChange} className={`bg-white border-gray`} />
                         </div>
                         <div className="flex flex-col gap-3">
                             <Label htmlFor="description">Description</Label>
