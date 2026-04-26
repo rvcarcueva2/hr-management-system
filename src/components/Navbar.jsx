@@ -5,9 +5,10 @@ import useAuth from '../hooks/useAuth'
 import useUsers from '../hooks/useUsers'
 import { FaChevronDown, FaUser } from 'react-icons/fa6'
 import { IoMdDocument } from "react-icons/io";
-import { IoIosSettings } from "react-icons/io";
 import { MdOutlineLogout } from "react-icons/md";
 import { BsBarChartFill } from "react-icons/bs";
+import { FaStar } from "react-icons/fa";
+
 
 
 
@@ -31,9 +32,8 @@ const Navbar = () => {
         { label: "Admin", icon: BsBarChartFill, size: 15, to: "/admin" },
         { label: "Profile", icon: FaUser, size: 15, to: "/profile" },
         { label: "Application", icon: IoMdDocument, size: 17, to: "/my-application" },
-        { label: "Settings", icon: IoIosSettings, size: 19, to: "/settings" },
+        { label: "Mentorship", icon: FaStar, size: 16, to: "/mentorship" },
         { label: "Logout", icon: MdOutlineLogout, size: 20, action: handleLogout }
-
 
     ]
 
