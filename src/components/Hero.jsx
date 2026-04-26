@@ -2,8 +2,8 @@ import Image from '../assets/images/hero-image.png'
 
 const Hero = () => {
     return (
-        <section className="bg-white h-100 py-20 mb-10 mt-0.5 ">
-            <div className="max-w-7xl  my-10 mx-auto px-10">
+        <section className="bg-white h-100 py-20 mb-10 border-b ">
+            <div className="max-w-7xl  my-10 mx-auto px-10 ">
 
                 <div className="flex items-center justify-between gap-10">
 
