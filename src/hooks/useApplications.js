@@ -22,10 +22,7 @@ const useApplications = () => {
                     updated_at,
                     job:jobs!applications_job_id_fkey (
                         title,
-                        company:companies!jobs_company_id_fkey (
-                            name,
-                            location
-                        )
+                        site
                     ),
                     applicant:users!applications_user_id_fkey (
                         id,
@@ -42,6 +39,7 @@ const useApplications = () => {
                         display_name
                     )
                 `)
+                        .neq('job_id', 47) // Except job_id 47
                         .order('created_at', { ascending: false }),
                     supabase
                         .from('users')

@@ -27,7 +27,6 @@ import {
     IconGripVertical,
     IconLayoutColumns,
     IconPlus,
-    IconTrashFilled,
     IconRefresh
 } from "@tabler/icons-react"
 import {
@@ -74,6 +73,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
     Table,
     TableBody,
@@ -97,7 +97,17 @@ import {
 
 } from "@/components/ui/card"
 
-import useJobs from "@/hooks/useJobs"
+import { PiWarningOctagonFill } from "react-icons/pi";
+import { BsShieldFillCheck } from "react-icons/bs";
+
+
+import useUsers from "@/hooks/useUsers"
+import useAuth from "@/hooks/useAuth"
+import useDepartments from "@/hooks/useDepartments";
+import useJobs from "@/hooks/useJobs";
+
+
+const tabs = ['Active', 'Inactive'];
 
 
 
@@ -118,7 +128,7 @@ function DragHandle({ id }) {
     )
 }
 
-const getColumns = (setDeleteModal) => [
+const getColumns = (setDeleteModal, setActivateModal) => [
     {
         id: "drag",
         header: () => null,
@@ -151,9 +161,15 @@ const getColumns = (setDeleteModal) => [
         enableHiding: false,
     },
     {
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => <TableCellViewer item={row.original} />,
+        enableHiding: false,
+    },
+    {
         accessorKey: "employee id",
         header: "Employee ID",
-        cell: ({ row }) => <TableCellViewer item={row.original} />,
+        cell: ({ row }) => <span>{row.original.employee_id ?? 'N/A'}</span>,
         enableHiding: false,
     },
     {
@@ -174,7 +190,7 @@ const getColumns = (setDeleteModal) => [
         accessorKey: "department",
         header: "Department",
         cell: ({ row }) => (
-            <span>{row.original.department.name ?? 'N/A'}</span>
+            <span>{row.original.department?.name ?? 'N/A'}</span>
         ),
     },
     {
@@ -183,6 +199,23 @@ const getColumns = (setDeleteModal) => [
         cell: ({ row }) => (
             <span>{row.original.role ?? 'N/A'}</span>
         ),
+    },
+    {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => {
+            const isActive = row.original.is_active !== false
+            const label = isActive ? "Active" : "Inactive"
+            const statusStyles = {
+                Active: "bg-green-100 text-green-700 border-green-300",
+                Inactive: "bg-red-100 text-red-700 border-red-300",
+            }
+            return (
+                <Badge variant="outline" className={statusStyles[label]}>
+                    {label}
+                </Badge>
+            )
+        },
     },
     {
         accessorKey: "date added",
@@ -206,11 +239,18 @@ const getColumns = (setDeleteModal) => [
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-32">
-                    <DropdownMenuItem variant="destructive" onClick={() => setDeleteModal({ open: true, jobId: row.original.id })}
-                    >
-                        <IconTrashFilled className="-mt-0.5" color="#cc0000" />
-                        Delete
-                    </DropdownMenuItem>
+                    {row.original.is_active === false ? (
+                        <DropdownMenuItem onClick={() => setActivateModal({ open: true, userId: row.original.id })}
+                        > <BsShieldFillCheck className="-mt-0.5 fill-green-600" />
+                            Activate
+                        </DropdownMenuItem>
+                    )
+                        : <DropdownMenuItem variant="destructive" onClick={() => setDeleteModal({ open: true, userId: row.original.id })}
+                        >
+                            <PiWarningOctagonFill className="-mt-0.5  fill-red-600" />
+                            Deactivate
+                        </DropdownMenuItem>
+                    }
                 </DropdownMenuContent>
             </DropdownMenu>
         ),
@@ -245,124 +285,39 @@ function DraggableRow({ row }) {
 }
 
 function TableCellViewer({ item }) {
-    const isMobile = useIsMobile()
-    const { updateJob } = useJobs()
-    const [open, setOpen] = React.useState(false)
-    const [employee, setEmployee] = React.useState(item.employee_id);
-    const [firstName, setFirstName] = React.useState(item.first_name);
-    const [lastName, setLastName] = React.useState(item.last_name);
-    const [role, setRole] = React.useState(item.role);
-
-
-
-
+    const [email, setEmail] = React.useState(item.email);
     return (
-        <Drawer open={open} onOpenChange={setOpen} direction={isMobile ? "bottom" : "right"}>
-            <DrawerTrigger asChild>
-                <Button variant="link" className="w-fit px-0 text-left text-foreground cursor-pointer">
-                    {item.employee_id ?? 'N/A'}
-                </Button>
-            </DrawerTrigger>
-            <DrawerContent>
-                <DrawerHeader>
-                    <div className="flex flex-col gap-3">
 
-                        <Input value={employee} onChange={(e) => setEmployee(e.target.value)} className={`bg-white border border-gray-200 h-12 px-4`} />
-                    </div>
-                </DrawerHeader>
-
-                <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent">
-                    {!isMobile && (
-                        <>
-                            <Separator />
-                            <div className="grid gap-2 ">
-                                <div className="text-muted-foreground">
-                                    Posted on {new Date(item.created_at).toLocaleString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric',
-                                        year: 'numeric',
-                                        hour: 'numeric',
-                                        minute: '2-digit',
-                                        second: '2-digit',
-                                        hour12: false
-
-                                    })}
-                                </div>
-                                <div className="text-muted-foreground mb-2">
-                                    Last updated {new Date(item.updated_at).toLocaleString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric',
-                                        year: 'numeric',
-                                        hour: 'numeric',
-                                        minute: '2-digit',
-                                        second: '2-digit',
-                                        hour12: false
-                                    })}
-                                </div>
-                                <Separator />
-                            </div>
-
-                        </>
-                    )}
-                    <div className="flex flex-col gap-4">
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-3">
+        <Button variant="link" className="w-fit px-0 text-left text-foreground cursor-pointer" asChild>
+            <a href={`/profile/${item.id}`} target="_blank">
+                {email ?? 'N/A'}
+            </a>
+        </Button>
 
 
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <div className="flex flex-col gap-3">
-
-
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-3">
-
-                            <div className="flex flex-col gap-3">
-                                <Label htmlFor="categpry">Category</Label>
-
-
-                            </div>
-                        </div>
-
-
-                        <div className="flex flex-col gap-3">
-
-                            <Label htmlFor="description">Description</Label>
-
-
-                        </div>
-                        <div className="flex flex-col gap-3">
-                            <Label htmlFor="job_id">Job ID</Label>
-
-                        </div>
-                    </div>
-                </div>
-                <DrawerFooter>
-                    <Button className="bg-[#378ADD] text-white">Apply</Button>
-                    <DrawerClose asChild>
-                        <Button variant="outline" className={`cursor-pointer`}>Cancel</Button>
-                    </DrawerClose>
-                </DrawerFooter>
-            </DrawerContent>
-        </Drawer>
     )
 }
 
-function AddJobDrawer() {
+function AddUserDrawer() {
     const isMobile = useIsMobile()
+    const { users } = useUsers();
+    const { signUp } = useAuth();
+    const { departments, loading, error } = useDepartments();
+    const { jobs, loading: jobsLoading, error: jobsError } = useJobs();
     const [open, setOpen] = useState(false);
-    const { submitJob, submitting } = useJobs()
+    const [jobOpen, setJobOpen] = useState(false);
+
 
 
     const [formData, setFormData] = useState({
-        title: "",
-        company: "",
-        salary: "",
-        type: "",
-        description: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        role: "",
+        departmentId: "",
+        jobId: "",
     })
 
     const handleChange = (e) => {
@@ -375,158 +330,214 @@ function AddJobDrawer() {
 
 
     const handleSubmit = async () => {
-
-        const jobPayload = {
-            title: formData.title,
-            type: formData.type,
-            category: formData.category,
-            description: formData.description,
-            salary: formData.salary,
+        if (formData.password !== formData.confirmPassword) {
+            toast.error("Passwords do not match")
+            return
         }
 
-        const result = await submitJob(jobPayload)
+        const { error } = await signUp(
+            formData.email,
+            formData.password,
+            formData.firstName,
+            formData.lastName,
+            formData.role,
+            formData.departmentId,
+            formData.jobId,
 
-        if (result.success) {
+        )
+
+        if (!error) {
             setFormData({
-                title: "",
-                type: "",
-                category: "",
-                description: "",
-                salary: "",
-                company: "",
+                firstName: "",
+                lastName: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+                role: "",
+                departmentId: "",
+                jobId: "",
             })
 
-            toast.success("Job posted successfully")
+            toast.success("User created successfully")
             setOpen(false)
 
             setTimeout(() => {
                 window.location.reload()
             }, 1500)
-
         } else {
-            toast.error(result.error)
+            toast.error(error.message || "Failed to create user")
         }
-
     }
 
     const isFormValid =
-        formData.title &&
-        formData.type &&
-        formData.category &&
-        formData.description &&
-        formData.salary
+        formData.firstName &&
+        formData.lastName &&
+        formData.email &&
+        formData.password &&
+        formData.confirmPassword &&
+        formData.role &&
+        formData.departmentId &&
+        formData.jobId
 
-    // Add job drawer
+    const selectedJob = jobs.find((job) => job.id === formData.jobId)
+
+    // Add user drawer
     return (
         <Drawer open={open} onOpenChange={setOpen} direction={isMobile ? "bottom" : "right"}>
             <DrawerTrigger asChild>
                 <Button variant="default" size="sm">
                     <IconPlus />
-                    <span className="hidden lg:inline">Add Job</span>
+                    <span className="hidden lg:inline">Add User</span>
                 </Button>
             </DrawerTrigger>
             <DrawerContent>
                 <DrawerHeader className="gap-1">
-                    <DrawerTitle>Add Job</DrawerTitle>
-                    <DrawerDescription>Fill in the details to post a new job.</DrawerDescription>
+                    <DrawerTitle>Add User</DrawerTitle>
+                    <DrawerDescription>Fill in the details to add a new user.</DrawerDescription>
                 </DrawerHeader>
 
                 <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent">
-                    <Separator />
+
                     <div className="flex flex-col gap-4">
                         <div className="grid  gap-4">
                             <div className="flex flex-col gap-3">
-                                <Label htmlFor="title">Job Title</Label>
-                                <Input id="title" value={formData.title} onChange={handleChange} />
+                                <Label htmlFor="firstName">First Name</Label>
+                                <Input id="firstName" value={formData.firstName} onChange={handleChange} className={`bg-white border-gray`} />
                             </div>
                         </div>
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="category">Job Category</Label>
+                            <Label htmlFor="category">Last Name</Label>
+                            <Input id="lastName" value={formData.lastName} onChange={handleChange} className={`bg-white border-gray`} />
+                        </div>
 
-                            <Select
-                                value={formData.category}
-                                onValueChange={(value) =>
-                                    setFormData(prev => ({
-                                        ...prev,
-                                        category: value
-                                    }))
-                                }
-                            >
-                                <SelectTrigger id="category" className="w-full">
-                                    <SelectValue placeholder="Select category" />
-                                </SelectTrigger>
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="salary">Email</Label>
+                            <Input id="email" value={formData.email} onChange={handleChange} className={`bg-white border-gray`} />
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="salary">Password</Label>
+                            <Input
+                                type="password"
+                                id="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                className={`bg-white border-gray`}
+                            />
 
-                                <SelectContent>
-                                    <SelectItem value="Technology">Technology</SelectItem>
-                                    <SelectItem value="Marketing">Marketing</SelectItem>
-                                    <SelectItem value="Human Resources">Human Resources</SelectItem>
-                                    <SelectItem value="Business Management">Business Management</SelectItem>
-                                    <SelectItem value="Technical Support">Technical Support</SelectItem>
-                                    <SelectItem value="Leadership">Leadership</SelectItem>
-                                    <SelectItem value="Data & Analytics">Data & Analytics</SelectItem>
-                                    <SelectItem value="Knowledge & Development">Knowledge & Development</SelectItem>
-                                </SelectContent>
-                            </Select>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="salary">Confirm Password</Label>
+                            <Input
+                                type="password"
+                                id="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                className={`bg-white border-gray`}
+                            />
+
                         </div>
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-3">
-                                <Label htmlFor="salary">Salary</Label>
 
+                            <div className="flex flex-col gap-3">
+                                <Label htmlFor="role">Role</Label>
                                 <Select
-                                    value={formData.salary}
+                                    value={formData.role}
                                     onValueChange={(value) =>
                                         setFormData(prev => ({
                                             ...prev,
-                                            salary: value
-                                        }))
-                                    }
-                                >
-                                    <SelectTrigger id="salary" className="w-full">
-                                        <SelectValue placeholder="Select salary" />
-                                    </SelectTrigger>
-
-                                    <SelectContent>
-                                        <SelectItem value="SG 25">SG 25</SelectItem>
-                                        <SelectItem value="SG 26">SG 26</SelectItem>
-                                        <SelectItem value="SG 27">SG 27</SelectItem>
-                                        <SelectItem value="SG 28">SG 28</SelectItem>
-                                        <SelectItem value="SG 29">SG 29</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <Label htmlFor="type">Employment Type</Label>
-                                <Select
-                                    value={formData.type}
-                                    onValueChange={(value) =>
-                                        setFormData(prev => ({
-                                            ...prev,
-                                            type: value
+                                            role: value
                                         }))
                                     }
                                 >
                                     <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select type" />
+                                        <SelectValue placeholder="Select role" />
                                     </SelectTrigger>
 
                                     <SelectContent>
-                                        <SelectItem value="On-site">On-site</SelectItem>
-                                        <SelectItem value="Remote">Remote</SelectItem>
-                                        <SelectItem value="Hybrid">Hybrid</SelectItem>
+                                        <SelectItem value="Employee">Employee</SelectItem>
+                                        <SelectItem value="Mentor">Mentor</SelectItem>
+                                        <SelectItem value="Reviewer">Reviewer</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <Label htmlFor="department">Department</Label>
+                                <Select
+                                    value={formData.departmentId}
+                                    onValueChange={(value) =>
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            departmentId: value
+                                        }))
+                                    }
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder={loading ? "Loading..." : "Select department"} />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        {error && (
+                                            <SelectItem value="" disabled>Failed to load departments</SelectItem>
+                                        )}
+                                        {departments.map((dept) => (
+                                            <SelectItem key={dept.id} value={dept.id}>
+                                                {dept.name}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
                         </div>
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="description">Description</Label>
-                            <textarea
-                                id="description"
-                                value={formData.description}
-                                onChange={handleChange}
-                                rows={7}
-                                placeholder="Write a description..."
-                                className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none resize-none bg-background"
-                            />
+                            <Label htmlFor="department">Job</Label>
+                            <Popover open={jobOpen} onOpenChange={setJobOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="w-full justify-start gap-2 cursor-pointer "
+                                    >
+                                        {selectedJob ? (
+                                            <span>{selectedJob.title}</span>
+                                        ) : (
+                                            <span className="text-muted-foreground">
+                                                {jobsLoading ? "Loading..." : "Select job"}
+                                            </span>
+                                        )}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                    side="left"
+                                    align="center"
+                                    sideOffset={30}
+                                    alignOffset={-4}
+                                    className="w-full bg-white p-3"
+                                >
+                                    <div className="flex max-h-64 flex-col gap-2 overflow-y-auto bg-white scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent">
+                                        {jobsError && (
+                                            <span className="text-sm text-muted-foreground">Failed to load jobs</span>
+                                        )}
+                                        {!jobsLoading && !jobsError && jobs.length === 0 && (
+                                            <span className="text-sm text-muted-foreground">No jobs available</span>
+                                        )}
+                                        {jobs.map((job) => (
+                                            <Button
+                                                key={job.id}
+                                                variant={formData.jobId === job.id ? "secondary" : "ghost"}
+                                                className="w-full justify-start"
+                                                onClick={() => {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        jobId: job.id
+                                                    }))
+                                                    setJobOpen(false)
+                                                }}
+                                            >
+                                                {job.title}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
                         </div>
                     </div>
                 </div>
@@ -534,10 +545,10 @@ function AddJobDrawer() {
                 <DrawerFooter>
                     <Button
                         onClick={handleSubmit}
-                        disabled={!isFormValid || submitting}
+                        disabled={!isFormValid}
                         className="bg-[#378ADD] text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {submitting ? "Posting..." : "Post Job"}
+                        Create Account
                     </Button>
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>
@@ -549,7 +560,11 @@ function AddJobDrawer() {
 }
 
 export function DataTable({ data: initialData }) {
-    const { deleteJob } = useJobs();
+    const [selectedTab, setSelectedTab] = React.useState('Active');
+    const filteredData = React.useMemo(() => {
+        if (selectedTab === 'Active') return initialData.filter(row => row.is_active !== false);
+        if (selectedTab === 'Inactive') return initialData.filter(row => row.is_active === false);
+    }, [initialData, selectedTab]);
     const [data, setData] = React.useState(() => initialData)
     const [rowSelection, setRowSelection] = React.useState({})
     const [columnVisibility, setColumnVisibility] = React.useState({})
@@ -567,9 +582,25 @@ export function DataTable({ data: initialData }) {
         () => data?.map(({ id }) => id) || [],
         [data]
     )
-    const [deleteModal, setDeleteModal] = React.useState({ open: false, jobId: null })
+    React.useEffect(() => {
+        setData(filteredData);
+    }, [filteredData]);
+
+    React.useEffect(() => {
+        setPagination(p => ({ ...p, pageIndex: 0 }));
+    }, [selectedTab]);
+
+
+    const [deleteModal, setDeleteModal] = React.useState({ open: false, userId: null })
+    const [activateModal, setActivateModal] = React.useState({ open: false, userId: null })
     // Pass setDeleteModal into columns
-    const columns = React.useMemo(() => getColumns(setDeleteModal), [setDeleteModal])
+    const columns = React.useMemo(
+        () => getColumns(setDeleteModal, setActivateModal),
+        [setDeleteModal, setActivateModal]
+    )
+
+    const { deactivateUser, reactivateUser } = useAuth()
+
 
 
     const table = useReactTable({
@@ -602,55 +633,129 @@ export function DataTable({ data: initialData }) {
         }
     }
 
-
-    const handleDelete = async () => {
-        const toastId = toast.loading('Deleting job...')
-
-        if (!deleteModal.jobId) {
-            toast.error('No job selected')
+    const handleSoftDelete = async () => {
+        const toastId = toast.loading('Updating user status...')
+        if (!deleteModal.userId) {
             return
         }
-        const success = await deleteJob(deleteModal.jobId, { id: toastId })
-        if (!success) {
-            toast.error('Failed to delete job')
+
+        const { error } = await deactivateUser(deleteModal.userId)
+
+        if (error) {
+            toast.error(error.message || "Failed to deactivate user"), { id: toastId }
             return
         }
-        toast.success('Job deleted successfully')
-        setDeleteModal({ open: false, jobId: null })
+
+        setData((prev) =>
+            prev.map((item) =>
+                item.id === deleteModal.userId ? { ...item, is_active: false } : item
+            )
+        )
+
+        toast.success("User deactivated successfully", { id: toastId })
+        setDeleteModal({ open: false, userId: null })
+        setTimeout(() => window.location.reload(), 1500)
+    }
+
+    const handleActivate = async () => {
+        const toastId = toast.loading('Updating user status...')
+        if (!activateModal.userId) {
+            return
+        }
+
+        const { error } = await reactivateUser(activateModal.userId)
+
+        if (error) {
+            toast.error(error.message || "Failed to reactivate user", { id: toastId })
+            return
+        }
+
+        setData((prev) =>
+            prev.map((item) =>
+                item.id === activateModal.userId ? { ...item, is_active: true } : item
+            )
+        )
+
+        toast.success("User activated successfully", { id: toastId })
+        setActivateModal({ open: false, userId: null })
         setTimeout(() => window.location.reload(), 1500)
     }
 
 
+
+
+
     return (
-        <Tabs defaultValue="outline" className="w-full flex-col justify-start gap-6">
-            <div className="flex items-center justify-end px-4 lg:px-6 ">
-                {deleteModal.open && (
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full flex-col justify-start gap-6">
+            <div className="flex items-center justify-between px-4 lg:px-6 ">
+                {activateModal.open && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                        <Card className="w-full max-w-md mx-4">
+                        <Card className="w-full max-w-md mx-4 rounded-lg">
                             <CardHeader>
-                                <CardTitle>Delete Job</CardTitle>
-                                <CardDescription>
-                                    This action cannot be undone. This will permanently delete the job and all its associated records.
+                                <CardTitle className={`font-bold`}>Confirm to activate user</CardTitle>
+                                <Separator />
+                                <CardDescription className={`mt-2`}>
+                                    This action will reactivate the account and restore all its associated access.
                                 </CardDescription>
                             </CardHeader>
                             <CardFooter className="flex justify-end gap-2">
                                 <Button
                                     variant="outline"
-                                    onClick={() => setDeleteModal({ open: false, jobId: null })}
+                                    onClick={() => setActivateModal({ open: false, userId: null })}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button onClick={handleActivate} className="bg-[#378ADD] text-white">Activate</Button>
+                            </CardFooter>
+                        </Card>
+                    </div>
+                )}
+                {deleteModal.open && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+                        <Card className="w-full max-w-md mx-4 rounded-lg">
+                            <CardHeader>
+                                <CardTitle className={`font-bold`}>Confirm to deactivate user</CardTitle>
+                                <Separator />
+                                <CardDescription className={`mt-2`}>
+                                    This will permanently deactivate the account and all its associated accessses.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardFooter className="flex justify-end gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setDeleteModal({ open: false, userId: null })}
                                 >
                                     Cancel
                                 </Button>
                                 <Button
                                     variant="destructive"
-                                    onClick={handleDelete}
+                                    onClick={handleSoftDelete}
                                 >
-                                    Delete
+                                    Deactivate
                                 </Button>
                             </CardFooter>
                         </Card>
                     </div>
                 )}
+                <Label htmlFor="view-selector" className="sr-only">View</Label>
+                <Select value={selectedTab} onValueChange={setSelectedTab}>
+                    <SelectTrigger className="flex w-fit @4xl/main:hidden" size="sm" id="view-selector">
+                        <SelectValue placeholder="Select a view" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {tabs.map(tab => (
+                            <SelectItem key={tab} value={tab}>{tab}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <TabsList className="hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:bg-muted-foreground/30 **:data-[slot=badge]:px-1 @4xl/main:flex">
+                    {tabs.map(tab => (
+                        <TabsTrigger key={tab} value={tab}>{tab}</TabsTrigger>
+                    ))}
+                </TabsList>
+
                 <div className="flex items-center gap-2">
+
                     <DropdownMenu>
                         <button onClick={() => window.location.reload()} className="bg-white border p-1 rounded-full hover:shadow-sm cursor-pointer">
                             <IconRefresh size={18} color="#1f2937" />
@@ -680,11 +785,11 @@ export function DataTable({ data: initialData }) {
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <AddJobDrawer setData={setData} />
+                    <AddUserDrawer setData={setData} />
 
                 </div>
             </div>
-            <TabsContent value="outline" className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
+            <TabsContent value={selectedTab} className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
                 <div className="overflow-hidden rounded-lg border">
                     <DndContext
                         collisionDetection={closestCenter}

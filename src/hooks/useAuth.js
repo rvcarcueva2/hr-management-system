@@ -42,11 +42,12 @@ const useAuth = () => {
     }, []);
 
     //  Sign Up
-    const signUp = async (email, password, firstName, lastName) => {
+    const signUp = async (email, password, firstName, lastName, role, departmentId, jobId) => {
         setLoading(true);
         setError(null);
 
         try {
+            const previousSession = session;
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
@@ -55,13 +56,40 @@ const useAuth = () => {
                         first_name: firstName,
                         last_name: lastName,
                         display_name: `${firstName} ${lastName}`,
+                        role,
+                        department_id: departmentId,
+                        job_id: jobId,
                     },
                 },
             });
 
+            console.log("signUp result", {
+                error,
+                userId: data?.user?.id,
+                userMetadata: data?.user?.user_metadata,
+                sessionCreated: Boolean(data?.session),
+            })
+
+            if (error) {
+                console.log("signUp error details", {
+                    message: error.message,
+                    status: error.status,
+                    name: error.name,
+                    code: error.code,
+                })
+            }
+
             if (error) {
                 setError(error.message);
                 return { data: null, error };
+            }
+
+            if (data?.session && previousSession) {
+                // Restore the existing session so admin stays logged in.
+                await supabase.auth.setSession({
+                    access_token: previousSession.access_token,
+                    refresh_token: previousSession.refresh_token,
+                });
             }
 
             return { data, error: null };
@@ -107,6 +135,56 @@ const useAuth = () => {
 
     };
 
+    // Deactivate (ban) a user via edge function
+    const deactivateUser = async (userId) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { data, error } = await supabase.functions.invoke("deactivate-user", {
+                body: { userId, isActive: false },
+            });
+
+            if (error) {
+                setError(error.message || "Failed to deactivate user");
+                return { data: null, error };
+            }
+
+            return { data, error: null };
+        } catch (err) {
+            setError(err.message || "Failed to deactivate user");
+            return { data: null, error: err };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Reactivate a user via edge function
+    const reactivateUser = async (userId) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { data, error } = await supabase.functions.invoke("reactivate-user", {
+                body: { userId, isActive: true },
+            });
+
+            if (error) {
+                setError(error.message || "Failed to reactivate user");
+                return { data: null, error };
+            }
+
+            return { data, error: null };
+        } catch (err) {
+            setError(err.message || "Failed to reactivate user");
+            return { data: null, error: err };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    
+
     return {
         user,
         session,
@@ -115,6 +193,8 @@ const useAuth = () => {
         signUp,
         login,
         logout,
+        deactivateUser,
+        reactivateUser,
     };
 };
 

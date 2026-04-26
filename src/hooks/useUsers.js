@@ -32,9 +32,7 @@ const useUsers = () => {
                             job:jobs!users_job_id_fkey (
                                 title,
                                 salary,
-                                company:companies!jobs_company_id_fkey (
-                                    location
-                                )
+                                site
                             )`)
                         .eq('id', userId)
                         .single(),
@@ -50,11 +48,9 @@ const useUsers = () => {
                             job:jobs!users_job_id_fkey (
                                 title,
                                 salary,
-                                company:companies!jobs_company_id_fkey (
-                                    location
-                                )
+                                site
                             )`)
-                        .order('created_at', { ascending: true })
+                        .order('created_at', { ascending: false })
                 ]);
 
                 if (userError) throw userError;
