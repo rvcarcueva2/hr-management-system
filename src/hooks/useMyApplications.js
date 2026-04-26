@@ -23,10 +23,7 @@ const useMyApplications = () => {
                         updated_at,
                         job:jobs!applications_job_id_fkey (
                             title,
-                            company:companies!jobs_company_id_fkey (
-                                name,
-                                location
-                            )
+                            site
                         ),
                         applicant:users!applications_user_id_fkey (
                             id,
