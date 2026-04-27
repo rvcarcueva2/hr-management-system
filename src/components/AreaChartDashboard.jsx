@@ -20,28 +20,25 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 const AreaChartDashboard = () => {
 
-     const chartData = [
-        { month: "January", desktop: 180, mobile: 210 },
-        { month: "February", desktop: 205, mobile: 200 },
-        { month: "March", desktop: 237, mobile: 120 },
-        { month: "April", desktop: 159, mobile: 190 },
-        { month: "May", desktop: 100, mobile: 130 },
-        { month: "June", desktop: 100, mobile: 140 },
-        { month: "July", desktop: 113, mobile: 190 },
-        { month: "August", desktop: 144, mobile: 190 },
-        { month: "September", desktop: 121, mobile: 153 },
-        { month: "October", desktop: 90, mobile: 100 },
-        { month: "November", desktop: 100, mobile: 140 },
-        { month: "December", desktop: 140, mobile: 140 },
+    const chartData = [
+        { month: "January", accepted: 18, rejected: 12 },
+        { month: "February", accepted: 15, rejected: 10 },
+        { month: "March", accepted: 17, rejected: 10 },
+        { month: "April", accepted: 13, rejected: 7 },
+        { month: "May", accepted: 13, rejected: 10 },
+        { month: "June", accepted: 13, rejected: 10 },
+        { month: "July", accepted: 10, rejected: 3 },
+        { month: "August", accepted: 10, rejected: 4 },
+
     ];
 
     const chartConfig = {
-        desktop: {
-            label: "Desktop",
+        accepted: {
+            label: "Accepted",
             color: "var(--chart-1)",
         },
-        mobile: {
-            label: "Mobile",
+        rejected: {
+            label: "Rejected",
             color: "var(--chart-2)",
         },
     };
@@ -51,7 +48,7 @@ const AreaChartDashboard = () => {
             <CardHeader>
                 <CardTitle className="text-gray-600">Area Chart - Legend</CardTitle>
                 <CardDescription>
-                    Showing total visitors for this year
+                    Showing total accepted and rejected applications for this year
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -74,26 +71,26 @@ const AreaChartDashboard = () => {
                             content={<ChartTooltipContent indicator="line" />}
                         />
                         <Area
-                            dataKey="mobile"
+                            dataKey="rejected"
                             type="natural"
-                            fill="var(--color-mobile)"
+                            fill="var(--color-rejected)"
                             fillOpacity={0.4}
-                            stroke="var(--color-mobile)"
+                            stroke="var(--color-rejected)"
                             stackId="a"
                         />
                         <Area
-                            dataKey="desktop"
+                            dataKey="accepted"
                             type="natural"
-                            fill="var(--color-desktop)"
+                            fill="var(--color-accepted)"
                             fillOpacity={0.4}
-                            stroke="var(--color-desktop)"
+                            stroke="var(--color-accepted)"
                             stackId="a"
                         />
                         <ChartLegend content={<ChartLegendContent />} />
                     </AreaChart>
                 </ChartContainer>
             </CardContent>
-           
+
         </Card>
     )
 }
