@@ -41,7 +41,88 @@ const usePrograms = () => {
         fetchPrograms();
     }, []);
 
-    return { programs, loading, error, fetchPrograms };
+    const updateProgram = async (programId, updates) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { error: updateError } = await supabase
+                .from('programs')
+                .update(updates)
+                .eq('id', programId);
+
+            if (updateError) throw updateError;
+            return true;
+        } catch (err) {
+            console.log('Error updating program', err);
+            setError(err.message);
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const submitProgram = async (programPayload) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+                const { data: authData, error: authError } = await supabase.auth.getUser();
+                if (authError) throw authError;
+
+                const mentorId = authData?.user?.id;
+                if (!mentorId) {
+                    throw new Error('No authenticated user found for mentor');
+                }
+
+            const { data, error: insertError } = await supabase
+                .from('programs')
+                    .insert([
+                        {
+                            ...programPayload,
+                            mentor: mentorId,
+                        },
+                    ])
+                .select()
+
+            if (insertError) throw insertError;
+
+            if (data?.length) {
+                setPrograms(prev => [data[0], ...prev]);
+            }
+
+            return { success: true, data };
+        } catch (err) {
+            console.log('Error submitting program', err);
+            setError(err.message);
+            return { success: false, error: err.message };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const deleteProgram = async (programId) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { error: deleteError } = await supabase
+                .from('programs')
+                .delete()
+                .eq('id', programId);
+
+            if (deleteError) throw deleteError;
+            return true;
+        } catch (err) {
+            console.log('Error deleting program', err);
+            setError(err.message);
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return { programs, loading, error, fetchPrograms, updateProgram, submitProgram, deleteProgram };
 }
 
 export default usePrograms
