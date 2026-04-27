@@ -17,22 +17,19 @@ import {
 const BarChartDashboard = () => {
 
     const chartData = [
-        { month: "January", desktop: 186 },
-        { month: "February", desktop: 305 },
-        { month: "March", desktop: 237 },
-        { month: "April", desktop: 73 },
-        { month: "May", desktop: 209 },
-        { month: "June", desktop: 214 },
-        { month: "July", desktop: 200 },
-        { month: "August", desktop: 112 },
-        { month: "September", desktop: 300 },
-        { month: "October", desktop: 239 },
-        { month: "November", desktop: 214 },
-        { month: "December", desktop: 220 },
+        { month: "January", application: 30 },
+        { month: "February", application: 25 },
+        { month: "March", application: 27 },
+        { month: "April", application: 20 },
+        { month: "May", application: 25 },
+        { month: "June", application: 24 },
+        { month: "July", application: 13 },
+        { month: "August", application: 14 },
+
     ]
     const chartConfig = {
-        desktop: {
-            label: "Desktop",
+        application: {
+            label: "Application",
             color: "var(--chart-3)",
         },
     }
@@ -40,8 +37,8 @@ const BarChartDashboard = () => {
         <>
             <Card className="w-1/2">
                 <CardHeader>
-                    <CardTitle className="text-gray-600">Bar Chart</CardTitle>
-                    <CardDescription>January - June 2024</CardDescription>
+                    <CardTitle className="text-gray-600">Applications</CardTitle>
+                    <CardDescription>Showing total applications this year</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ChartContainer config={chartConfig}>
@@ -58,7 +55,7 @@ const BarChartDashboard = () => {
                                 cursor={false}
                                 content={<ChartTooltipContent hideLabel />}
                             />
-                            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={8} />
+                            <Bar dataKey="application" fill="var(--color-application)" radius={8} />
                         </BarChart>
                     </ChartContainer>
                 </CardContent>
