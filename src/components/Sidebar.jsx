@@ -6,6 +6,7 @@ import { GoBriefcase } from "react-icons/go";
 import { IoCalendarClearOutline } from "react-icons/io5";
 import { PiHeadset } from "react-icons/pi";
 import { FiUsers } from "react-icons/fi";
+import { FaRegStar } from "react-icons/fa";
 import { PiBookBookmark } from "react-icons/pi";
 
 
@@ -67,6 +68,10 @@ const Sidebar = () => {
                     <NavLink to="admin-users" className={linkClass}>
                         <FiUsers className="text-lg -mt-0.5 mr-1" />
                         <span className="ml-3">Users</span>
+                    </NavLink>
+                    <NavLink to="admin-mentorship" className={linkClass}>
+                        <FaRegStar className="text-lg -mt-0.5 mr-1" />
+                        <span className="ml-3">Mentorship</span>
                     </NavLink>
                     <div className="mt-4 mb-2">
                         <span className=" text-xs text-gray-500 py-4 px-6 uppercase">Support</span>

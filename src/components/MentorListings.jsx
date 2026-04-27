@@ -9,8 +9,6 @@ import Pagination from './Pagination'
 import JobType from './JobType'
 
 
-
-
 const MentorListings = ({ isHome = false }) => {
     const { programs, loading } = usePrograms(); // Hook loader
     const { users } = useUsers();
@@ -24,7 +22,8 @@ const MentorListings = ({ isHome = false }) => {
 
     // Filter
     const filteredPrograms = useMemo(() => {
-        let processed = programs;
+        const visiblePrograms = programs.filter((program) => program.is_visible === true);
+        let processed = visiblePrograms;
 
         //filter() is an array method used to create a new array containing only the elements that pass a condition.
         if (selectedCategory && selectedCategory !== 'All Categories') {
@@ -85,7 +84,7 @@ const MentorListings = ({ isHome = false }) => {
                             <JobType selectedType={selectedType} setSelectedType={setSelectedType} />
                             <Search search={search} setSearch={setSearch} />
                             <CategoryDropdown selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
-                           
+
 
                         </div>
                     )}

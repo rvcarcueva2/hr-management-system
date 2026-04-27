@@ -1,8 +1,9 @@
-import React from 'react'
+import { useState } from 'react'
 import Image from '../assets/images/mentor-image.png'
-import { Separator } from './ui/separator'
+import ApplyMentorModal from './ApplyMentorModal';
 
 const ApplyMentor = () => {
+    const [showModal, setShowModal] = useState(false);
     return (
         <>
             <section className=" h-100 py-20 my-30 rounded-xl bg-white shadow-md relative">
@@ -28,6 +29,7 @@ const ApplyMentor = () => {
                                 Share your expertise, guide aspiring professionals, and be part of a community that values growth, leadership and real bussiness impact.
                             </p>
                             <button
+                                onClick={() => setShowModal((prev) => (!prev))}
                                 className="border py-3 px-6 rounded-full mt-6 transition-shadow bg-white  hover:shadow-sm cursor-pointer"
                             >
                                 <span className="flex items-center gap-2">
@@ -35,6 +37,9 @@ const ApplyMentor = () => {
                                 </span>
 
                             </button>
+                            {showModal && (
+                                <ApplyMentorModal setShowModal={setShowModal} />
+                            )}
                         </div>
 
 

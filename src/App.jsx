@@ -13,6 +13,7 @@ import AuthLayout from './layouts/AuthLayout'
 const HomePage = lazy(() => import('./pages/HomePage'))
 const JobsPage = lazy(() => import('./pages/JobsPage'))
 const JobPage = lazy(() => import('./pages/JobPage'))
+const MentorPage = lazy(() => import('./pages/MentorPage'))
 const MentorsPage = lazy(() => import('./pages/MentorsPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const MyApplicationPage = lazy(() => import('./pages/MyApplicationPage'))
@@ -23,6 +24,7 @@ const AdminCalendarPage = lazy(() => import('./pages/AdminCalendarPage'))
 const AdminJobsPage = lazy(() => import('./pages/AdminJobsPage'))
 const AdminMentorsPage = lazy(() => import('./pages/AdminMentorsPage'))
 const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'))
+const AdminMentorshipPage = lazy(() => import('./pages/AdminMentorshipPage'))
 const AdmintTicketPage = lazy(() => import('./pages/AdmintTicketPage'))
 
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
@@ -32,6 +34,11 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 const jobLoader = async (args) => {
   const module = await import('./pages/JobPage')
   return module.jobLoader(args)
+}
+
+const programLoader = async (args) => {
+  const module = await import('./pages/MentorPage')
+  return module.programLoader(args)
 }
 
 const profileLoader = async (args) => {
@@ -49,6 +56,7 @@ function App() {
           <Route path='jobs' element={<JobsPage />} />
           <Route path='jobs/:id' element={<JobPage />} loader={jobLoader} />
           <Route path='mentors' element={<MentorsPage />} />
+          <Route path='programs/:id' element={<MentorPage />} loader={programLoader} />
           <Route path='profile' element={<ProfilePage />} loader={profileLoader} />
           <Route path='profile/:id' element={<ProfilePage />} loader={profileLoader} />
           <Route path='my-application' element={<MyApplicationPage />} />
@@ -63,6 +71,7 @@ function App() {
           <Route path='admin-jobs' element={<AdminJobsPage />} />
           <Route path='admin-mentors' element={<AdminMentorsPage />} />
           <Route path='admin-users' element={<AdminUsersPage />} />
+          <Route path='admin-mentorship' element={<AdminMentorshipPage />} />
           <Route path='admin-ticket' element={<AdmintTicketPage />} />
         </Route>
 
