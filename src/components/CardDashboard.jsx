@@ -8,10 +8,29 @@ import {
     CardTitle,
     CardAction
 } from "@/components/ui/card"
+import useJobs from '@/hooks/useJobs'
+import useApplications from '@/hooks/useApplications'
+import useUsers from '@/hooks/useUsers'
 
 
 
 const CardDashboard = () => {
+
+    const { jobs } = useJobs();
+    const countJobs = jobs.length;
+
+    const { applications } = useApplications();
+    const countApplications = applications.length;
+
+    const { users } = useUsers();
+    const acceptedCount = applications.filter(
+        application => application.status === 'Accepted'
+    ).length;
+    const userCount = users.length;
+    const countPercentage = userCount ? (acceptedCount / userCount) * 100 : 0;
+    const roundedResult = countPercentage.toFixed(2);
+
+
     return (
         <>
             <div className='flex gap-2'>
@@ -19,9 +38,9 @@ const CardDashboard = () => {
 
                 <Card className="@container/card w-md h-44 mb-2">
                     <CardHeader>
-                        <CardDescription>Total Revenue</CardDescription>
+                        <CardDescription>Total Jobs Posted</CardDescription>
                         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                            $1,250.00
+                            {countJobs}
                         </CardTitle>
                         <CardAction>
                             <Badge variant="outline">
@@ -35,21 +54,21 @@ const CardDashboard = () => {
                             Trending up this month
                         </div>
                         <div className="text-muted-foreground">
-                            Visitors for the last 6 months
+                            Job posted for the last 6 months
                         </div>
                     </CardFooter>
                 </Card>
 
                 <Card className="@container/card flex w-md h-44 mb-2">
                     <CardHeader>
-                        <CardDescription>Total Revenue</CardDescription>
+                        <CardDescription>Total Applications</CardDescription>
                         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                            $1,250.00
+                            {countApplications}
                         </CardTitle>
                         <CardAction>
                             <Badge variant="outline">
 
-                                +12.5%
+                                +3.5%
                             </Badge>
                         </CardAction>
                     </CardHeader>
@@ -58,21 +77,21 @@ const CardDashboard = () => {
                             Trending up this month
                         </div>
                         <div className="text-muted-foreground">
-                            Visitors for the last 6 months
+                            Applications for the last 6 months
                         </div>
                     </CardFooter>
                 </Card>
 
                 <Card className="@container/card flex w-md h-44 mb-2">
                     <CardHeader>
-                        <CardDescription>Total Revenue</CardDescription>
+                        <CardDescription>Internal Mobility</CardDescription>
                         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                            $1,250.00
+                            {roundedResult}%
                         </CardTitle>
                         <CardAction>
                             <Badge variant="outline">
 
-                                +12.5%
+                                +6.5%
                             </Badge>
                         </CardAction>
                     </CardHeader>
@@ -81,7 +100,7 @@ const CardDashboard = () => {
                             Trending up this month
                         </div>
                         <div className="text-muted-foreground">
-                            Visitors for the last 6 months
+                            Percentage of internal mobility for the last 6 months
                         </div>
                     </CardFooter>
                 </Card>
