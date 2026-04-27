@@ -248,7 +248,7 @@ function DraggableRow({ row }) {
 
 function TableCellViewer({ item }) {
     const isMobile = useIsMobile()
-    const { updateJob, updateCourses } = useJobs()
+    const { updateJob, updateCourses, loading } = useJobs()
     const [open, setOpen] = React.useState(false)
     const [title, setTitle] = React.useState(item.title);
     const [type, setType] = React.useState(item.type);
@@ -284,12 +284,11 @@ function TableCellViewer({ item }) {
     }
 
     const handleSubmit = async () => {
-        const toastId = toast.loading('Updating job...')
 
         const jobSuccess = await updateJob(item.id, title, type, category, salary, description, site, isVisible)
 
         if (!jobSuccess) {
-            toast.error('Failed to update job', { id: toastId })
+            toast.error('Failed to update job')
             return
         }
 
@@ -297,11 +296,11 @@ function TableCellViewer({ item }) {
         const coursesSuccess = await updateCourses(item.id, validCourses)
 
         if (!coursesSuccess) {
-            toast.error('Job updated but failed to save courses', { id: toastId })
+            toast.error('Job updated but failed to save courses')
             return
         }
 
-        toast.success('Job updated successfully!', { id: toastId })
+        toast.success('Job updated successfully!')
         setOpen(false)
         setTimeout(() => window.location.reload(), 1500)
     }
@@ -477,7 +476,12 @@ function TableCellViewer({ item }) {
                     </div>
                 </div>
                 <DrawerFooter>
-                    <Button onClick={handleSubmit} className="bg-[#378ADD] text-white">Apply</Button>
+                    <Button
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        className="bg-[#378ADD] text-white">
+                        {loading ? "Applying changes..." : "Apply"}
+                    </Button>
                     <DrawerClose asChild>
                         <Button variant="outline" className={`cursor-pointer`}>Cancel</Button>
                     </DrawerClose>
@@ -768,10 +772,11 @@ export function DataTable({ data: initialData }) {
             <div className="flex items-center justify-end px-4 lg:px-6 ">
                 {deleteModal.open && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                        <Card className="w-full max-w-md mx-4">
+                        <Card className="w-full max-w-md mx-4 rounded-lg">
                             <CardHeader>
-                                <CardTitle>Delete Job</CardTitle>
-                                <CardDescription>
+                                <CardTitle className={`font-bold`}>Confirm to delete the job </CardTitle>
+                                <Separator />
+                                <CardDescription className={`mt-2`}>
                                     This action cannot be undone. This will permanently delete the job and all its associated records.
                                 </CardDescription>
                             </CardHeader>

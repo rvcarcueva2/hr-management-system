@@ -301,7 +301,7 @@ function TableCellViewer({ item }) {
 function AddUserDrawer() {
     const isMobile = useIsMobile()
     const { users } = useUsers();
-    const { signUp } = useAuth();
+    const { signUp, loading: signUpLoading } = useAuth();
     const { departments, loading, error } = useDepartments();
     const { jobs, loading: jobsLoading, error: jobsError } = useJobs();
     const [open, setOpen] = useState(false);
@@ -406,16 +406,16 @@ function AddUserDrawer() {
                             </div>
                         </div>
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="category">Last Name</Label>
+                            <Label htmlFor="lastName">Last Name</Label>
                             <Input id="lastName" value={formData.lastName} onChange={handleChange} className={`bg-white border-gray`} />
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="salary">Email</Label>
+                            <Label htmlFor="email">Email</Label>
                             <Input id="email" value={formData.email} onChange={handleChange} className={`bg-white border-gray`} />
                         </div>
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="salary">Password</Label>
+                            <Label htmlFor="password">Password</Label>
                             <Input
                                 type="password"
                                 id="password"
@@ -426,7 +426,7 @@ function AddUserDrawer() {
 
                         </div>
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="salary">Confirm Password</Label>
+                            <Label htmlFor="confirmPassword">Confirm Password</Label>
                             <Input
                                 type="password"
                                 id="confirmPassword"
@@ -489,7 +489,7 @@ function AddUserDrawer() {
                             </div>
                         </div>
                         <div className="flex flex-col gap-3">
-                            <Label htmlFor="department">Job</Label>
+                            <Label htmlFor="job">Job</Label>
                             <Popover open={jobOpen} onOpenChange={setJobOpen}>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -545,10 +545,10 @@ function AddUserDrawer() {
                 <DrawerFooter>
                     <Button
                         onClick={handleSubmit}
-                        disabled={!isFormValid}
+                        disabled={!isFormValid || signUpLoading}
                         className="bg-[#378ADD] text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Create Account
+                        {signUpLoading ? "Creating account..." : "Create Account"}
                     </Button>
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>

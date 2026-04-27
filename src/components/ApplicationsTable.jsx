@@ -93,6 +93,7 @@ import { useSchedules } from "@/hooks/useSchedules"
 import useStorageUrl from '@/hooks/useStorageUrl'
 import useUsers from "@/hooks/useUsers"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import useApplications from "@/hooks/useApplications"
 
 
 const tabs = ['All', 'Pending', 'Scheduled', 'Accepted', 'Rejected'];
@@ -234,6 +235,7 @@ function TableCellViewer({ item, table }) {
     const isMobile = useIsMobile()
     const { user } = useUsers()
     const updateStatus = table?.options?.meta?.updateStatus;
+    const { loading } = useApplications;
     const assigneeOptions = table?.options?.meta?.assigneeOptions ?? [];
     const { createSchedule, updateSchedule, events } = useSchedules(item.id) // pass application id here
     const [status, setStatus] = React.useState(item.status)
@@ -343,7 +345,7 @@ function TableCellViewer({ item, table }) {
 
     const handleSubmit = async () => {
         const toastId = toast.loading('Updating application...')
-
+        setOpen(false)
         const success = await updateStatus(item.id, status, reviewerId, assigned)
         if (!success) {
             toast.error('Failed to update application', { id: toastId })
@@ -388,9 +390,7 @@ function TableCellViewer({ item, table }) {
                 return
             }
         }
-
         toast.success('Application updated successfully!', { id: toastId })
-        setOpen(false)
 
     };
 
@@ -582,7 +582,11 @@ function TableCellViewer({ item, table }) {
                 </div>
 
                 <DrawerFooter>
-                    <Button onClick={handleSubmit} className="bg-[#378ADD] text-white">Apply</Button>
+                    <Button onClick={handleSubmit}
+                        disabled={loading}
+                        className="bg-[#378ADD] text-white">
+                        Apply
+                    </Button>
                     <DrawerClose asChild>
                         <Button variant="outline" className={`cursor-pointer`}>Cancel</Button>
                     </DrawerClose>
