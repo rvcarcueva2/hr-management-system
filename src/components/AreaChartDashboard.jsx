@@ -46,7 +46,7 @@ const AreaChartDashboard = () => {
     return (
         <Card className="w-1/2">
             <CardHeader>
-                <CardTitle className="text-gray-600">Area Chart - Legend</CardTitle>
+                <CardTitle className="text-gray-600">Application Status Breakdown</CardTitle>
                 <CardDescription>
                     Showing total accepted and rejected applications for this year
                 </CardDescription>

@@ -37,7 +37,7 @@ const BarChartDashboard = () => {
         <>
             <Card className="w-1/2">
                 <CardHeader>
-                    <CardTitle className="text-gray-600">Applications</CardTitle>
+                    <CardTitle className="text-gray-600">Applications Breakdown</CardTitle>
                     <CardDescription>Showing total applications this year</CardDescription>
                 </CardHeader>
                 <CardContent>
