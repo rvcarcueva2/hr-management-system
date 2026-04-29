@@ -2,63 +2,33 @@ import supabase from '../utils/supabaseClient'
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link, useLoaderData } from 'react-router-dom'
-import { FaChevronLeft, FaMapMarker, FaCircle, FaChevronDown } from 'react-icons/fa';
+import { FaChevronLeft} from 'react-icons/fa';
 import { FaLightbulb } from "react-icons/fa6";
 import { FaRegCircleCheck } from "react-icons/fa6";
-import ApplyModal from '../components/ApplyModal';
-import useCourses from '../hooks/useCourses';
-import EnrollModal from '@/components/EnrollModal';
 import AvatarUpload from "../components/AvatarUpload";
+import ApplyApprenticeModal from '@/components/ApplyApprenticeModal';
+import useApprentice from '@/hooks/useApprentice';
 
 const MentorPage = () => {
     const { id } = useParams();
     const program = useLoaderData(); // useLoaderData is the programLoader
     const [showModal, setShowModal] = useState(false);
-    const [showLearnDropdown, setShowLearnDropdown] = useState(false);
-    const [showEnrollModal, setShowEnrollModal] = useState(false);
+    const [hasApplied, setHasApplied] = useState(false);
+    const { fetchApprentice } = useApprentice();
 
-    // const [isEnrolled, setIsEnrolled] = useState(false);
-    // useEffect(() => {
-    //     const checkEnrollment = async () => {
-    //         const { data: { session } } = await supabase.auth.getSession()
-    //         const userId = session?.user?.id
-
-
-    //         const { data } = await supabase
-    //             .from("enrollees")
-    //             .select("id")
-    //             .eq("user_id", userId)
-    //             .in("course_id", courseIds)
-    //             .limit(1)
-
-    //         if (data && data.length > 0) setIsEnrolled(true)
-    //     }
-
-    //     checkEnrollment()
-    // }, [courses]) // runs whenever courses load
 
     const mentorName = program.mentor?.display_name || 'Mentor';
     const avatarUrl = program.mentor?.avatar_url;
 
-    // const [hasApplied, setHasApplied] = useState(false);
-    // useEffect(() => {
-    //     const checkApplication = async () => {
-    //         const { data: { session } } = await supabase.auth.getSession()
-    //         const userId = session?.user?.id
-    //         if (!userId) return
+    useEffect(() => {
+        const checkApplication = async () => {
+            const data = await fetchApprentice();
+            const applied = data?.some((item) => item?.program?.id === program?.id);
+            setHasApplied(Boolean(applied));
+        };
 
-    //         const { data } = await supabase
-    //             .from("applications")
-    //             .select("id")
-    //             .eq("user_id", userId)
-    //             .eq("job_id", id)
-    //             .limit(1)
-
-    //         if (data && data.length > 0) setHasApplied(true)
-    //     }
-
-    //     checkApplication()
-    // }, [id])
+        checkApplication();
+    }, [fetchApprentice, program?.id]);
 
     return (
         <>
@@ -84,20 +54,28 @@ const MentorPage = () => {
                                         <div className='text-gray-500'>{program.type}</div>
 
                                         <button
-                                            className="border py-3 px-6 rounded-full transition-shadow cursor-pointer"
-                                        > <span className="flex items-center gap-2">
-                                                {/* <FaRegCircleCheck className='text-[17px]' /> Applied */}
-                                                Apply Now
-                                            </span>
+                                            onClick={() => !hasApplied && setShowModal(true)}
+                                            className={`border py-3 px-6 rounded-full transition-shadow
+                                                ${hasApplied
+                                                    ? "bg-white text-[#0d624d] cursor-default"
+                                                    : "bg-white hover:shadow-md cursor-pointer"
+                                                }`}
+                                            disabled={hasApplied}
+                                        >
+                                            {hasApplied ? (
+                                                <span className="flex items-center gap-2">
+                                                    <FaRegCircleCheck className='text-[17px]' /> Applied
+                                                </span>
+                                            ) : "Apply Now"}
                                         </button>
 
-                                        {/* {showModal && (
-                                            <ApplyModal
+                                        {showModal && (
+                                            <ApplyApprenticeModal
                                                 setShowModal={setShowModal}
-                                                job={job}
+                                                program={program}
                                                 onApplySuccess={() => setHasApplied(true)}  //  update instantly on success
                                             />
-                                        )} */}
+                                        )}
 
                                     </div>
 
@@ -141,8 +119,25 @@ const MentorPage = () => {
                                         Program Duration
                                     </h3>
 
-                                    <p className='mb-4'>{program.start_date} </p>
+                                    <p>
+                                        {new Date(program.start_date).toLocaleString('en-US', {
+                                            timeZone: 'Asia/Taipei',
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year: 'numeric',
 
+
+                                        })}
+                                        <span> - </span>
+                                        {new Date(program.end_date).toLocaleString('en-US', {
+                                            timeZone: 'Asia/Taipei',
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year: 'numeric',
+
+
+                                        })}
+                                    </p>
                                 </div>
 
 
