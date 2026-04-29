@@ -32,6 +32,7 @@ const useApprentice = (options = {}) => {
                         employee_id,
                         email,
                         display_name,
+                        avatar_url,
                         job:jobs!users_job_id_fkey (
                         id,
                         title
@@ -107,13 +108,14 @@ const useApprentice = (options = {}) => {
         setError(null);
 
         try {
-            const { error: updateError } = await supabase
+            const { data, error: updateError } = await supabase
                 .from("apprentice")
                 .update({ status })
-                .eq("id", applicationId);
+                .eq("id", applicationId)
+                
 
             if (updateError) throw updateError;
-
+            
             const updatedAt = new Date().toISOString();
             setApprentices((prev) =>
                 prev.map((app) =>
