@@ -230,11 +230,11 @@ function ApprenticeCellViewer({ item, table }) {
         const templates = {
             Accepted: {
                 subject: "Congratulations! Your Application Has Been Accepted",
-                html: `<h2>Application Accepted</h2><p>Hi ${applicantName},</p><p>We are pleased to inform you that you have been <strong>accepted</strong> for the position of <strong>${extraData.jobTitle}</strong>.</p><p>We will be in touch shortly with the next steps.</p>`,
+                html: `<h2>Application Accepted</h2><p>Hi ${applicantName},</p><p>We are pleased to inform you that you have been <strong>accepted</strong> for the mentorship program <strong>${extraData.jobTitle}</strong>.</p><p>We will be in touch shortly with the next steps.</p>`,
             },
             Rejected: {
                 subject: "Update on Your Application",
-                html: `<h2>Application Update</h2><p>Hi ${applicantName},</p><p>Thank you for your interest. After careful consideration, we regret to inform you that we will not be moving forward with your application for the position of <strong>${extraData.jobTitle}</strong>at this time.</p><p>We wish you the best in your job search.</p>`,
+                html: `<h2>Application Update</h2><p>Hi ${applicantName},</p><p>Thank you for your interest. After careful consideration, we regret to inform you that we will not be moving forward with your application for mentorship program<strong>${extraData.jobTitle}</strong>at this time.</p><p>We will inform you for the further details of why this happened. Thank you.</p>`,
             },
         }
 
