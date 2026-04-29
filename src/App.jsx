@@ -2,6 +2,7 @@ import './index.css'
 import { lazy, Suspense } from "react";
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
 import Spinner from './components/Spinner';
+import { RequireAuth, RequireGuest, RequireRole } from './components/RouteGuards';
 
 
 // Layouts
@@ -25,6 +26,7 @@ const AdminJobsPage = lazy(() => import('./pages/AdminJobsPage'))
 const AdminMentorsPage = lazy(() => import('./pages/AdminMentorsPage'))
 const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'))
 const AdminMentorshipPage = lazy(() => import('./pages/AdminMentorshipPage'))
+const AdminApprenticePage = lazy(() => import('./pages/AdminApprenticePage'))
 const AdmintTicketPage = lazy(() => import('./pages/AdmintTicketPage'))
 
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
@@ -53,31 +55,40 @@ function App() {
       <>
         <Route path='/' element={<MainLayout />} >
           <Route index element={<HomePage />} />
-          <Route path='jobs' element={<JobsPage />} />
-          <Route path='jobs/:id' element={<JobPage />} loader={jobLoader} />
-          <Route path='mentors' element={<MentorsPage />} />
-          <Route path='programs/:id' element={<MentorPage />} loader={programLoader} />
-          <Route path='profile' element={<ProfilePage />} loader={profileLoader} />
-          <Route path='profile/:id' element={<ProfilePage />} loader={profileLoader} />
-          <Route path='my-application' element={<MyApplicationPage />} />
-          <Route path='*' element={<NotFoundPage />} />
-
+          <Route element={<RequireAuth />}>
+            <Route path='jobs' element={<JobsPage />} />
+            <Route path='jobs/:id' element={<JobPage />} loader={jobLoader} />
+            <Route path='mentors' element={<MentorsPage />} />
+            <Route path='programs/:id' element={<MentorPage />} loader={programLoader} />
+            <Route path='profile' element={<ProfilePage />} loader={profileLoader} />
+            <Route path='profile/:id' element={<ProfilePage />} loader={profileLoader} />
+            <Route path='my-application' element={<MyApplicationPage />} />
+            <Route path='*' element={<NotFoundPage />} />
+          </Route>
         </Route>
 
-        <Route path='/admin' element={<AdminLayout />}>
-          <Route index element={<AdminPage />} />
-          <Route path='admin-applications' element={<AdminApplicationsPage />} />
-          <Route path='admin-calendar' element={<AdminCalendarPage />} />
-          <Route path='admin-jobs' element={<AdminJobsPage />} />
-          <Route path='admin-mentors' element={<AdminMentorsPage />} />
-          <Route path='admin-users' element={<AdminUsersPage />} />
-          <Route path='admin-mentorship' element={<AdminMentorshipPage />} />
-          <Route path='admin-ticket' element={<AdmintTicketPage />} />
+        <Route path='/admin' element={<RequireRole allowedRoles={["Admin", "Reviewer", "Mentor"]} />}>
+          <Route element={<AdminLayout />}>
+            <Route element={<RequireRole allowedRoles={["Admin", "Reviewer"]} />}>
+              <Route index element={<AdminPage />} />
+              <Route path='admin-applications' element={<AdminApplicationsPage />} />
+              <Route path='admin-calendar' element={<AdminCalendarPage />} />
+              <Route path='admin-jobs' element={<AdminJobsPage />} />
+              <Route path='admin-mentors' element={<AdminMentorsPage />} />
+              <Route path='admin-users' element={<AdminUsersPage />} />
+              <Route path='admin-ticket' element={<AdmintTicketPage />} />
+            </Route>
+            <Route element={<RequireRole allowedRoles={["Mentor"]} />}>
+              <Route path='admin-mentorship' element={<AdminMentorshipPage />} />
+              <Route path='admin-apprentice' element={<AdminApprenticePage />} />
+            </Route>
+          </Route>
         </Route>
 
         <Route element={<AuthLayout />}>
-          <Route path='/auth/login' element={<LoginPage />} />
-
+          <Route element={<RequireGuest />}>
+            <Route path='/auth/login' element={<LoginPage />} />
+          </Route>
         </Route>
 
       </>

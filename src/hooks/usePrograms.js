@@ -3,6 +3,7 @@ import supabase from '../utils/supabaseClient'
 
 const usePrograms = () => {
     const [programs, setPrograms] = useState([]);
+    const [mentorPrograms, setMentorPrograms] = useState([])
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -11,6 +12,7 @@ const usePrograms = () => {
         setError(null);
 
         try {
+
             const { data, error: fetchError } = await supabase
                 .from('programs')
                 .select(`*,
@@ -41,6 +43,48 @@ const usePrograms = () => {
         fetchPrograms();
     }, []);
 
+    const fetchMentorPrograms = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { data: authData, error: authError } = await supabase.auth.getUser();
+            if (authError) throw authError;
+
+            const userId = authData?.user?.id;
+            if (!userId) throw new Error('No authenticated user found');
+
+            const { data, error: fetchError } = await supabase
+                .from('programs')
+                .select(`*,
+                    mentor:users!programs_mentor_fkey (
+                        id,
+                        display_name,
+                        avatar_url,
+                        job:jobs!users_job_id_fkey (
+                            title
+                        )
+                    )
+                `)
+                .eq('mentor', userId)
+                .order('created_at', { ascending: false })
+                .order('updated_at', { ascending: false })
+
+            if (fetchError) throw fetchError;
+
+            setMentorPrograms(data || []);
+        } catch (err) {
+            console.log('Error fetching programs', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchMentorPrograms();
+    }, []);
+
     const updateProgram = async (programId, updates) => {
         setLoading(true);
         setError(null);
@@ -67,22 +111,22 @@ const usePrograms = () => {
         setError(null);
 
         try {
-                const { data: authData, error: authError } = await supabase.auth.getUser();
-                if (authError) throw authError;
+            const { data: authData, error: authError } = await supabase.auth.getUser();
+            if (authError) throw authError;
 
-                const mentorId = authData?.user?.id;
-                if (!mentorId) {
-                    throw new Error('No authenticated user found for mentor');
-                }
+            const mentorId = authData?.user?.id;
+            if (!mentorId) {
+                throw new Error('No authenticated user found for mentor');
+            }
 
             const { data, error: insertError } = await supabase
                 .from('programs')
-                    .insert([
-                        {
-                            ...programPayload,
-                            mentor: mentorId,
-                        },
-                    ])
+                .insert([
+                    {
+                        ...programPayload,
+                        mentor: mentorId,
+                    },
+                ])
                 .select()
 
             if (insertError) throw insertError;
@@ -122,7 +166,7 @@ const usePrograms = () => {
         }
     };
 
-    return { programs, loading, error, fetchPrograms, updateProgram, submitProgram, deleteProgram };
+    return { programs, mentorPrograms, loading, error, fetchPrograms, fetchMentorPrograms, updateProgram, submitProgram, deleteProgram };
 }
 
 export default usePrograms

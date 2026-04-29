@@ -80,14 +80,7 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs"
-import {
-    Card,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
 
-} from "@/components/ui/card"
 
 
 import { useSchedules } from "@/hooks/useSchedules"
@@ -95,6 +88,15 @@ import useStorageUrl from '@/hooks/useStorageUrl'
 import useUsers from "@/hooks/useUsers"
 import { Popover, PopoverTrigger } from "@/components/ui/popover"
 import useMyApplications from "@/hooks/useMyApplications"
+
+const tabs = ['Job Application', 'Mentorship Application'];
+
+const statusStyles = {
+    Pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
+    Accepted: "bg-green-100 text-green-700 border-green-300",
+    Scheduled: "bg-blue-100 text-blue-700 border-blue-300",
+    Rejected: "bg-red-100 text-red-700 border-red-300",
+};
 
 function DragHandle({ id }) {
     const { attributes, listeners } = useSortable({ id })
@@ -113,7 +115,7 @@ function DragHandle({ id }) {
     )
 }
 
-const getColumns = (setDeleteModal) => [
+const getJobColumns = (setDeleteModal) => [
     {
         id: "drag",
         header: () => null,
@@ -161,25 +163,14 @@ const getColumns = (setDeleteModal) => [
     {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => {
-            const status = row.original.status;
-
-            const statusStyles = {
-                Pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
-                Accepted: "bg-green-100 text-green-700 border-green-300",
-                Scheduled: "bg-blue-100 text-blue-700 border-blue-300",
-                Rejected: "bg-red-100 text-red-700 border-red-300",
-            }
-
-            return (
-                <Badge
-                    variant="outline"
-                    className={`px-1.5 ${statusStyles[status] ?? "text-muted-foreground"}`}
-                >
-                    {status}
-                </Badge>
-            )
-        },
+        cell: ({ row }) => (
+            <Badge
+                variant="outline"
+                className={`px-1.5 ${statusStyles[row.original.status] ?? "text-muted-foreground"}`}
+            >
+                {row.original.status}
+            </Badge>
+        ),
     },
     {
         accessorKey: "Reviewer",
@@ -188,6 +179,79 @@ const getColumns = (setDeleteModal) => [
             <span>{row.original.reviewer?.display_name ?? 'N/A'}</span>
         )
 
+    },
+    {
+        accessorKey: "date applied",
+        header: "Date Applied",
+        cell: ({ row }) => (
+            <span>{new Date(row.original.created_at).toLocaleDateString()}</span>
+        ),
+    },
+    {
+        accessorKey: "date updated",
+        header: "Date Updated",
+        cell: ({ row }) => (
+            <span>{new Date(row.original.updated_at).toLocaleDateString()}</span>
+        ),
+    },
+]
+
+const getApprenticeColumns = () => [
+    {
+        id: "drag",
+        header: () => null,
+        cell: ({ row }) => <DragHandle id={row.original.id} />,
+    },
+    {
+        id: "select",
+        header: ({ table }) => (
+            <div className="flex items-center justify-center">
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
+                />
+            </div>
+        ),
+        cell: ({ row }) => (
+            <div className="flex items-center justify-center">
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                />
+            </div>
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: "program",
+        header: "Program",
+        cell: ({ row }) => <ApprenticeCellViewer item={row.original} />,
+        enableHiding: false,
+    },
+    {
+        accessorKey: "mentor",
+        header: "Mentor",
+        cell: ({ row }) => (
+            <span>{row.original.program?.mentor?.display_name ?? 'N/A'}</span>
+        ),
+    },
+    {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => (
+            <Badge
+                variant="outline"
+                className={`px-1.5 ${statusStyles[row.original.status] ?? "text-muted-foreground"}`}
+            >
+                {row.original.status}
+            </Badge>
+        ),
     },
     {
         accessorKey: "date applied",
@@ -385,12 +449,12 @@ function TableCellViewer({ item, setDeleteModal }) {
                     </div>
                 </div>
                 <DrawerFooter>
-                    <Button 
-                    disabled={!meetingLink}
-                    onClick={() => {
-                        const link = meetingLink
-                        if (link) window.open(link, '_blank')
-                    }}
+                    <Button
+                        disabled={!meetingLink}
+                        onClick={() => {
+                            const link = meetingLink
+                            if (link) window.open(link, '_blank')
+                        }}
                         className="bg-[#378ADD] text-white">Join Meeting</Button>
 
                     <Button
@@ -412,12 +476,99 @@ function TableCellViewer({ item, setDeleteModal }) {
     )
 };
 
-export function DataTable({ data: initialData }) {
-    const [selectedTab, setSelectedTab] = React.useState('All');
+function ApprenticeCellViewer({ item }) {
+    const isMobile = useIsMobile()
+    const [open, setOpen] = React.useState(false)
+
+    return (
+        <Drawer open={open} onOpenChange={setOpen} direction={isMobile ? "bottom" : "right"}>
+            <DrawerTrigger asChild>
+                <Button variant="link" className="w-fit px-0 text-left text-foreground cursor-pointer">
+                    {item.program?.title ?? 'N/A'}
+                </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+                <DrawerHeader className="gap-1">
+                    <DrawerTitle>Mentorship Application</DrawerTitle>
+                    <DrawerDescription>
+                        Your mentorship application is under review. Please wait for the mentor's approval.
+                    </DrawerDescription>
+                </DrawerHeader>
+                <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent">
+                    {!isMobile && (
+                        <>
+                            <Separator />
+                            <div className="grid gap-2">
+                                <div className="text-muted-foreground">
+                                    Applied on {new Date(item.created_at).toLocaleString('en-US', {
+                                        timeZone: 'Asia/Taipei', month: 'short', day: 'numeric',
+                                        year: 'numeric', hour: 'numeric', minute: '2-digit',
+                                        second: '2-digit', hour12: false
+                                    })}
+                                </div>
+                                <div className="text-muted-foreground mb-2">
+                                    Last updated {new Date(item.updated_at).toLocaleString('en-US', {
+                                        month: 'short', day: 'numeric', year: 'numeric',
+                                        hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: false
+                                    })}
+                                </div>
+                                <Separator />
+                            </div>
+                        </>
+                    )}
+                    <div className="flex flex-col gap-4">
+                        <div className="grid gap-4">
+                            <div className="flex flex-col gap-3">
+                                <Label>Program</Label>
+                                <Input defaultValue={item.program?.title ?? 'N/A'} className="cursor-default" readOnly />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="flex flex-col gap-3">
+                                <Label>Mentor</Label>
+                                <Input
+                                    defaultValue={item.program?.mentor?.display_name ?? 'N/A'}
+                                    className="cursor-default"
+                                    readOnly
+                                />
+                            </div>
+                            <div className="flex flex-col gap-3">
+                                <Label htmlFor="status">Status</Label>
+                                <Input defaultValue={item.status ?? 'N/A'} className="cursor-default" readOnly />
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label>Topic</Label>
+                            <Input defaultValue={item.program?.topic ?? 'N/A'} className="cursor-default" readOnly />
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            <Label>Type</Label>
+                            <Input defaultValue={item.program?.type ?? 'N/A'} className="cursor-default" readOnly />
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="application_id">Application ID</Label>
+                            <Input defaultValue={item.id ?? 'No Result'} readOnly />
+                        </div>
+                    </div>
+                </div>
+                <DrawerFooter>
+                    <DrawerClose asChild>
+                        <Button variant="outline" className="cursor-pointer">Close</Button>
+                    </DrawerClose>
+                </DrawerFooter>
+            </DrawerContent>
+        </Drawer>
+    )
+}
+
+export function DataTable({ data: initialData, apprenticeData = [] }) {
+    const [selectedTab, setSelectedTab] = React.useState('Job Application');
     const filteredData = React.useMemo(() => {
-        if (selectedTab === 'All') return initialData;
-        return initialData.filter(row => row.status === selectedTab);
-    }, [initialData, selectedTab]);
+        if (selectedTab === 'Mentorship Application') return apprenticeData;
+        return initialData;
+    }, [initialData, apprenticeData, selectedTab]);
 
     const { deleteApplication } = useMyApplications()
     const [data, setData] = React.useState(filteredData)
@@ -445,7 +596,10 @@ export function DataTable({ data: initialData }) {
 
     const [deleteModal, setDeleteModal] = React.useState({ open: false, applicationId: null })
     // Pass setDeleteModal into columns
-    const columns = React.useMemo(() => getColumns(setDeleteModal), [setDeleteModal])
+    const columns = React.useMemo(() => {
+        if (selectedTab === 'Mentorship Application') return getApprenticeColumns();
+        return getJobColumns(setDeleteModal);
+    }, [selectedTab, setDeleteModal])
 
     const handleDelete = async () => {
         if (!deleteModal.applicationId) {
@@ -494,9 +648,14 @@ export function DataTable({ data: initialData }) {
     }
 
 
+    const emptyMessage = selectedTab === 'Mentorship Application'
+        ? "You don't have a mentorship application yet."
+        : "You don't have an application yet.";
+
     return (
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full flex-col justify-start gap-6">
-            <div className="flex items-center justify-end px-2 sm:px-4 ">
+            <div className="flex items-center justify-between px-2 sm:px-4 ">
+
                 {deleteModal.open && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50 supports-backdrop-filter:backdrop-blur-xs">
                         <div className="bg-gray-50 rounded-lg shadow-lg w-full max-w-md p-8">
@@ -527,6 +686,22 @@ export function DataTable({ data: initialData }) {
 
                     </div>
                 )}
+                <Label htmlFor="view-selector" className="sr-only">View</Label>
+                <Select value={selectedTab} onValueChange={setSelectedTab}>
+                    <SelectTrigger className="flex w-fit @4xl/main:hidden" size="sm" id="view-selector">
+                        <SelectValue placeholder="Select a view" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {tabs.map(tab => (
+                            <SelectItem key={tab} value={tab}>{tab}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <TabsList className="hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:bg-muted-foreground/30 **:data-[slot=badge]:px-1 @4xl/main:flex">
+                    {tabs.map(tab => (
+                        <TabsTrigger key={tab} value={tab}>{tab}</TabsTrigger>
+                    ))}
+                </TabsList>
                 <div className="flex items-center gap-2">
                     <DropdownMenu>
                         <button onClick={() => window.location.reload()} className="bg-white border p-1 rounded-full hover:shadow-sm cursor-pointer">
@@ -588,7 +763,7 @@ export function DataTable({ data: initialData }) {
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={columns.length} className="h-24 text-center">
-                                            You don't have an application yet.
+                                            {emptyMessage}
                                         </TableCell>
                                     </TableRow>
                                 )}
