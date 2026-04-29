@@ -310,10 +310,7 @@ function ApprenticeCellViewer({ item, table }) {
             </DrawerTrigger>
             <DrawerContent>
                 <DrawerHeader className="gap-1">
-                    <DrawerTitle>{item.applicant?.employee_id}</DrawerTitle>
-                    <div className="flex gap-2 leading-none ">
-                        {item.applicant?.display_name}
-                    </div>
+                    <DrawerTitle>{item.applicant?.display_name}</DrawerTitle>
                     <DrawerDescription>
                         {item.applicant?.email}
                     </DrawerDescription>
