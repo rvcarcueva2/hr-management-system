@@ -260,7 +260,7 @@ function TableCellViewer({ item }) {
     const [courses, setCourses] = React.useState([]);
     const { courses: existingCourses, loading: coursesLoading } = useCourses(item.id)
     React.useEffect(() => {
-        if (coursesLoading) return  // ✅ wait until fetch is done
+        if (coursesLoading) return  
         if (existingCourses.length === 0) return
 
         setCourses(existingCourses.map(c => ({
@@ -494,7 +494,7 @@ function TableCellViewer({ item }) {
 function AddJobDrawer() {
     const isMobile = useIsMobile()
     const [open, setOpen] = useState(false);
-    const { submitJob, submitting } = useJobs()
+    const { submitJob, updateCourses, submitting } = useJobs()
 
 
     const [formData, setFormData] = useState({
@@ -504,6 +504,21 @@ function AddJobDrawer() {
         site: "",
         description: "",
     })
+    const [courses, setCourses] = useState([])
+
+    const addCourse = () => {
+        setCourses((prev) => [...prev, { id: Date.now(), title: "", link: "" }])
+    }
+
+    const updateCourse = (id, field, value) => {
+        setCourses((prev) => prev.map((course) => (
+            course.id === id ? { ...course, [field]: value } : course
+        )))
+    }
+
+    const removeCourse = (id) => {
+        setCourses((prev) => prev.filter((course) => course.id !== id))
+    }
 
     const handleChange = (e) => {
         const { id, value } = e.target
@@ -528,6 +543,24 @@ function AddJobDrawer() {
         const result = await submitJob(jobPayload)
 
         if (result.success) {
+            const jobId = result.data?.[0]?.id
+            const validCourses = courses.filter((course) => (
+                course.title?.trim() && course.link?.trim()
+            ))
+
+            if (validCourses.length && !jobId) {
+                toast.error("Job posted but failed to save courses")
+                return
+            }
+
+            if (validCourses.length && jobId) {
+                const coursesSuccess = await updateCourses(jobId, validCourses)
+                if (!coursesSuccess) {
+                    toast.error("Job posted but failed to save courses")
+                    return
+                }
+            }
+
             setFormData({
                 title: "",
                 type: "",
@@ -536,6 +569,7 @@ function AddJobDrawer() {
                 salary: "",
                 site: ""
             })
+            setCourses([])
 
             toast.success("Job posted successfully")
             setOpen(false)
@@ -673,6 +707,42 @@ function AddJobDrawer() {
                                 placeholder="Write a description..."
                                 className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none resize-none bg-background"
                             />
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            <Label>Courses</Label>
+
+                            {courses.map((course) => (
+                                <div key={course.id} className="flex gap-2 items-center">
+                                    <Input
+                                        placeholder="Course title"
+                                        value={course.title}
+                                        onChange={(e) => updateCourse(course.id, "title", e.target.value)}
+                                        className="bg-white border border-gray-200"
+                                    />
+                                    <Input
+                                        placeholder="Course link"
+                                        value={course.link}
+                                        onChange={(e) => updateCourse(course.id, "link", e.target.value)}
+                                        className="bg-white border border-gray-200"
+                                    />
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => removeCourse(course.id)}
+                                        className="shrink-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer"
+                                    >
+                                        <IconX className="size-4" />
+                                    </Button>
+                                </div>
+                            ))}
+
+                            <Button
+                                variant="outline"
+                                onClick={addCourse}
+                                className="w-full border-dashed cursor-pointer hover:border-[#378ADD] text-gray-600 hover:text-[#378ADD]"
+                            >
+                                <IconPlus className="size-4 mr-2" /> Add Course
+                            </Button>
                         </div>
                     </div>
                 </div>
