@@ -28,11 +28,13 @@ const Navbar = () => {
         navigate("/auth/login");
     };
 
+    const role = currentUser?.role;
+
     const dropdown = [ // Data-driven UI approach,
-        { label: "Admin", icon: BsBarChartFill, size: 15, to: "/admin" },
+        ...(role === "Admin" || role === "Reviewer" ? [{ label: "Admin", icon: BsBarChartFill, size: 15, to: "/admin" }] : []),
         { label: "Profile", icon: FaUser, size: 15, to: "/profile" },
         { label: "Application", icon: IoMdDocument, size: 17, to: "/my-application" },
-        { label: "Mentorship", icon: FaStar, size: 16, to: "/mentorship" },
+        ...(role === "Mentor" ? [{ label: "Mentorship", icon: FaStar, size: 16, to: "/admin/admin-mentorship" }] : []),
         { label: "Logout", icon: MdOutlineLogout, size: 20, action: handleLogout }
 
     ]
