@@ -48,18 +48,19 @@ const ProfileForm = ({ profile }) => {
     return (
         <>
 
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 ">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
 
-                <div className="w-full my-6 lg:col-span-2">
-
-                    <div className="p-6 m-auto mb-4 w-full h-full bg-white border rounded-lg shadow-md flex flex-col">
-                        <form className="flex flex-col md:flex-row gap-14 items-start">
+                <div className="max-w-md my-6 lg:col-span-2">
+                    {/* Profile */}
+                    <div className="p-6 m-auto bg-white rounded-lg shadow-md flex flex-col">
+                        <form className="flex flex-col md:flex-row gap-12 items-start">
                             {/* Profile Avatar */}
                             <AvatarUpload
                                 userId={id || user?.id}
                                 isViewOnly={isViewOnly}
                                 avatarUrl={profile?.avatar_url}
                                 alt={profile?.display_name || 'Avatar'}
+                                className={`ml-6`}
                             />
                             
                             <div className="w-full space-y-5">
@@ -89,18 +90,18 @@ const ProfileForm = ({ profile }) => {
                         <div className="px-6 py-6 w-full mt-6">
                             {/* Personal Information */}
                             <div className='flex gap-3'>
-                                <AiFillInfoCircle className='text-[22px] mt-0.5 text-[#0F6E56]' />
-                                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                                <AiFillInfoCircle className='text-[20px] mt-1 text-[#0F6E56]' />
+                                <h2 className="text-lg font-semibold text-gray-800 mb-4">
                                     Personal Information
                                 </h2>
                             </div>
 
                             {/* Info Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-2 gap-10">
 
-                                <div>
+                                <div >
                                     <p className="text-sm text-gray-500">Email</p>
-                                    <p className="text-base font-medium text-gray-800">
+                                    <p className="text-sm font-medium">
                                         {profile?.email}
                                     </p>
                                 </div>
@@ -108,20 +109,20 @@ const ProfileForm = ({ profile }) => {
 
                                 <div>
                                     <p className="text-sm text-gray-500">Employee ID</p>
-                                    <p className="text-base font-medium text-gray-800">
+                                    <p className="text-sm font-medium">
                                         {profile?.employee_id}
                                     </p>
                                 </div>
 
                                 <div>
                                     <p className="text-sm text-gray-500">Address</p>
-                                    <p className="text-base font-medium text-gray-800">
+                                    <p className="text-sm font-medium">
                                         {profile?.address}
                                     </p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500">Phone</p>
-                                    <p className="text-base font-medium text-gray-800">
+                                    <p className="text-sm font-medium">
                                         {profile?.phone}
                                     </p>
                                 </div>
@@ -129,34 +130,34 @@ const ProfileForm = ({ profile }) => {
 
                             {/* Job Position */}
                             <div className='flex gap-3 mt-6'>
-                                <FaBuilding className='text-lg mt-1 text-[#0F6E56]' />
-                                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                                <FaBuilding className='text-[18px] mt-1 text-[#0F6E56]' />
+                                <h2 className="text-lg font-semibold text-gray-800 mb-4">
                                     Company Position
                                 </h2>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <p className="text-sm text-gray-500">Department</p>
-                                    <p className="text-base font-medium text-gray-800">
+                                    <p className="text-sm font-medium ">
                                         {profile?.department?.name}
                                     </p>
                                 </div>
 
                                 <div>
                                     <p className="text-sm text-gray-500">Job Position</p>
-                                    <p className="text-base font-medium text-gray-800">
+                                    <p className="text-sm font-medium ">
                                         {profile?.job?.title}
                                     </p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500">Supervisor</p>
-                                    <p className="text-base font-medium text-gray-800">
+                                    <p className="text-sm font-medium ">
                                         {profile?.department?.supervisor?.display_name}
                                     </p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500">Site</p>
-                                    <p className="text-base font-medium text-gray-800">
+                                    <p className="text-sm font-medium ">
                                         {profile?.job?.site}
                                     </p>
                                 </div>
@@ -167,8 +168,8 @@ const ProfileForm = ({ profile }) => {
                 </div >
 
                 {/* Courses */}
-                <div className="w-full my-6 lg:col-span-3">
-                    <div className="p-6 m-auto mb-4 w-full h-full bg-white border rounded-lg shadow-md">
+                <div className="w-full max-w-2xl my-6 lg:col-span-3">
+                    <div className="p-6 m-auto h-full bg-white  rounded-lg shadow-md">
                         <div className="my-2 flex gap-3">
                             <FaUserGraduate className="text-lg mt-1 text-[#0F6E56]" />
                             <p className="block text-xl font-semibold mb-1">Courses Enrolled</p>
@@ -210,7 +211,7 @@ const ProfileForm = ({ profile }) => {
                                                             href={course.courseLink}
                                                             target="_blank"
 
-                                                            className="flex w-119 bg-gray-50 border rounded-lg p-4 my-2 mr-3 shadow-sm hover:bg-gray-100 cursor-pointer"
+                                                            className="flex w-101 bg-gray-50 border rounded-lg p-4 my-2 mr-3 shadow-sm hover:bg-gray-100 cursor-pointer"
                                                         >
                                                             <p className="font-bold text-gray-800">{course.courseTitle}</p>
                                                         </a>

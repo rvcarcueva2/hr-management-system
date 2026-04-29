@@ -1,3 +1,4 @@
+import { TiAttachment } from "react-icons/ti";
 import useAvatarUpload from "../hooks/useAvatarUpload";
 import { cn } from "../lib/utils";
 
@@ -10,7 +11,6 @@ const AvatarUpload = ({
     alt = "Avatar",
 }) => {
     const { avatarUrl, uploading, error, uploadAvatar } = useAvatarUpload(userId);
-    // Prefer an immediate, parent-provided URL while the hook fetches the latest avatar.
     const displayAvatarUrl = providedAvatarUrl || avatarUrl;
 
     const handleUpload = (e) => {
@@ -27,7 +27,7 @@ const AvatarUpload = ({
         >
             <div
                 className={cn(
-                    "w-32 h-32 border rounded-full bg-gray-200 overflow-hidden flex items-center justify-center",
+                    "relative group w-32 h-32 border rounded-full bg-gray-200 overflow-hidden flex items-center justify-center",
                     className
                 )}
             >
@@ -40,22 +40,28 @@ const AvatarUpload = ({
                 ) : (
                     <span className="text-gray-500 text-sm"></span>
                 )}
+
+                {/* Hover Overlay */}
+                {!isViewOnly && (
+                    <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition cursor-pointer">
+                        {uploading ? (
+                            <span className="text-white text-xs">Uploading...</span>
+                        ) : (
+                            <TiAttachment className="text-white text-3xl" />
+                        )}
+
+                        <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleUpload}
+                            disabled={uploading}
+                        />
+                    </label>
+                )}
             </div>
 
             {error && <p className="text-red-500 text-sm">{error}</p>}
-
-            {!isViewOnly && (
-                <label className="cursor-pointer bg-gray-100 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 transition">
-                    {uploading ? 'Uploading...' : 'Upload Image'}
-                    <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleUpload}
-                        disabled={uploading}
-                    />
-                </label>
-            )}
         </div>
     );
 };
