@@ -4,15 +4,15 @@ import usePrograms from '@/hooks/usePrograms';
 import Spinner from '@/components/Spinner';
 
 const AdminMentorshipPage = () => {
-    const { programs, loading, error } = usePrograms();
+    const { mentorPrograms, loading, error } = usePrograms();
 
     if (loading) return <Spinner loading={loading} />;
     if (error) return <p>Error: {error}</p>;
 
     return (
         <>
-            <DataTable data={programs} />
-            
+            <DataTable data={mentorPrograms} />
+
         </>
     )
 }
