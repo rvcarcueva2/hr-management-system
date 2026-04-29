@@ -27,11 +27,11 @@ const MentorListings = ({ isHome = false }) => {
 
         //filter() is an array method used to create a new array containing only the elements that pass a condition.
         if (selectedCategory && selectedCategory !== 'All Categories') {
-            processed = processed.filter(program => program.topic === selectedCategory);
+            processed = processed.filter(program => program.category === selectedCategory);
         }
 
         if (selectedCategory === 'All Categories') {
-            program => program.topic
+            program => program.category
         }
 
         if (selectedType && selectedType !== 'All Types') {
