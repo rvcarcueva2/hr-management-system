@@ -48,6 +48,11 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/ui/avatar"
+import {
     Drawer,
     DrawerClose,
     DrawerContent,
@@ -87,8 +92,6 @@ import {
 import {
     Tabs,
     TabsContent,
-    TabsList,
-    TabsTrigger,
 } from "@/components/ui/tabs"
 import {
     Card,
@@ -100,7 +103,10 @@ import {
 } from "@/components/ui/card"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
+import { FaSearch } from "react-icons/fa"
+
 import usePrograms from "@/hooks/usePrograms"
+import useApprentice from "@/hooks/useApprentice"
 
 
 
@@ -121,7 +127,7 @@ function DragHandle({ id }) {
     )
 }
 
-const getColumns = (setDeleteModal) => [
+const getColumns = (setDeleteModal, acceptedByProgram) => [
     {
         id: "drag",
         header: () => null,
@@ -156,7 +162,12 @@ const getColumns = (setDeleteModal) => [
     {
         accessorKey: "title",
         header: "Title",
-        cell: ({ row }) => <TableCellViewer item={row.original} />,
+        cell: ({ row }) => (
+            <TableCellViewer
+                item={row.original}
+                participants={acceptedByProgram?.get(row.original.id) ?? []}
+            />
+        ),
         enableHiding: false,
     },
     {
@@ -240,10 +251,12 @@ function DraggableRow({ row }) {
     )
 }
 
-function TableCellViewer({ item }) {
+function TableCellViewer({ item, participants = [] }) {
     const isMobile = useIsMobile()
     const { updateProgram, loading } = usePrograms();
+    const participantCount = participants.length
     const [open, setOpen] = React.useState(false)
+    const [participantQuery, setParticipantQuery] = React.useState("")
     const [title, setTitle] = React.useState(item.title);
     const [type, setType] = React.useState(item.type);
     const [category, setCategory] = React.useState(item.category);
@@ -258,6 +271,41 @@ function TableCellViewer({ item }) {
     );
     const [startDateOpen, setStartDateOpen] = React.useState(false);
     const [endDateOpen, setEndDateOpen] = React.useState(false);
+
+    const filteredParticipants = React.useMemo(() => {
+        const normalizedQuery = participantQuery.trim().toLowerCase()
+        if (!normalizedQuery) return participants
+
+        return participants.filter((participant) => {
+            const displayName = participant.display_name?.toLowerCase() ?? ""
+            const email = participant.email?.toLowerCase() ?? ""
+            const employeeId = participant.employee_id?.toLowerCase() ?? ""
+
+            return (
+                displayName.includes(normalizedQuery) ||
+                email.includes(normalizedQuery) ||
+                employeeId.includes(normalizedQuery)
+            )
+        })
+    }, [participants, participantQuery])
+
+    const getParticipantInitials = (participant) => {
+        if (participant.display_name) {
+            return participant.display_name
+                .split(" ")
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((part) => part[0])
+                .join("")
+                .toUpperCase()
+        }
+
+        if (participant.email) {
+            return participant.email.slice(0, 2).toUpperCase()
+        }
+
+        return "NA"
+    }
 
     const handleSubmit = async () => {
 
@@ -336,6 +384,8 @@ function TableCellViewer({ item }) {
                     <div className="flex flex-col gap-4">
 
                         <div className="grid grid-cols-2 gap-4">
+
+
                             <div className="flex flex-col gap-3">
                                 <Label>Type</Label>
                                 <Select value={type} onValueChange={setType}>
@@ -371,7 +421,6 @@ function TableCellViewer({ item }) {
                                 </div>
                             </div>
                         </div>
-
                         <div className="flex flex-col gap-3">
                             <Label htmlFor="topic">Topic</Label>
                             <Input value={topic} onChange={(e) => setTopic(e.target.value)} className={`bg-white border-gray`} />
@@ -467,6 +516,98 @@ function TableCellViewer({ item }) {
                                 onChange={(e) => setDescription(e.target.value)}
                             />
                         </div>
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="participants">Participants</Label>
+                            <Popover>
+                                <PopoverTrigger>
+                                    <>
+                                        <div className="relative inline-flex w-full">
+                                            <Button
+                                                variant="outline"
+                                                className="w-full justify-start gap-2 font-normal"
+                                            >
+                                                {participantCount
+                                                    ? "View list of participants"
+                                                    : "No accepted participants"}
+                                            </Button>
+                                            {participantCount > 0 && (
+                                                <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-[#378ADD] flex items-center justify-center text-white text-[10px] font-semibold">
+                                                    {participantCount}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                    side="left"
+                                    align="center"
+                                    sideOffset={30}
+                                    className="w-80 bg-white">
+                                    {participantCount ? (
+                                        <div className="flex max-h-72 flex-col gap-3 overflow-auto">
+                                            <div className="flex m-auto mt-2">
+
+                                                <form value={participantQuery}
+                                                    onChange={(event) => setParticipantQuery(event.target.value)}
+                                                    placeholder="Search participants"
+                                                    className="ml-auto flex items-center border border-gray-300 rounded-lg w-70 max-w-md">
+
+                                                    <button
+                                                        type="submit"
+                                                        className="px-3 text-gray-400 hover:text-gray-600 cursor-pointer"
+                                                    >
+                                                        <FaSearch className="w-4 h-4" />
+                                                    </button>
+                                                    <Input
+                                                        value={participantQuery}
+                                                        onChange={(event) => setParticipantQuery(event.target.value)}
+                                                        placeholder="Search participants"
+                                                        className="bg-white focus-visible:ring-0 "
+                                                    />
+                                                </form>
+                                            </div>
+                                            {filteredParticipants.length ? (
+                                                <div className="flex flex-col gap-2 mt-1 mb-4">
+                                                    {filteredParticipants.map((participant) => (
+                                                        <div
+                                                            key={participant.id}
+                                                            className="flex items-center gap-3 rounded-md px-2 py-1"
+                                                        >
+                                                            <Avatar size="sm" className="size-8">
+                                                                <AvatarImage
+                                                                    src={participant.avatar_url ?? ""}
+                                                                    alt={participant.display_name ?? "Participant"}
+                                                                />
+                                                                <AvatarFallback>
+                                                                    {getParticipantInitials(participant)}
+                                                                </AvatarFallback>
+                                                            </Avatar>
+                                                            <div className="flex flex-col">
+                                                                <div className="text-sm font-medium">
+                                                                    {participant.display_name ?? "Unnamed participant"}
+                                                                </div>
+                                                                <div className="text-xs text-muted-foreground">
+                                                                    {participant.email ?? "No email"}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="text-sm text-muted-foreground">
+                                                    No participants match your search.
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="text-sm text-muted-foreground">
+                                            No accepted participants yet.
+                                        </div>
+                                    )}
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+
 
                         <div className="flex flex-col gap-3">
                             <Label htmlFor="program_id">Program ID</Label>
@@ -777,6 +918,7 @@ function AddProgramDrawer() {
 
 export function DataTable({ data: initialData }) {
     const { deleteProgram } = usePrograms();
+    const { apprentices } = useApprentice({ includeAll: true });
     const [data, setData] = React.useState(() => initialData ?? [])
     const [rowSelection, setRowSelection] = React.useState({})
     const [columnVisibility, setColumnVisibility] = React.useState({})
@@ -796,7 +938,31 @@ export function DataTable({ data: initialData }) {
     )
     const [deleteModal, setDeleteModal] = React.useState({ open: false, programId: null })
     // Pass setDeleteModal into columns
-    const columns = React.useMemo(() => getColumns(setDeleteModal), [setDeleteModal])
+    const acceptedByProgram = React.useMemo(() => {
+        const map = new Map()
+
+        apprentices
+            .filter((application) => application.status === "Accepted")
+            .forEach((application) => {
+                const programId = application.program?.id
+                const participant = application.applicant
+
+                if (!programId || !participant) return
+
+                if (!map.has(programId)) {
+                    map.set(programId, [])
+                }
+
+                map.get(programId).push(participant)
+            })
+
+        return map
+    }, [apprentices])
+
+    const columns = React.useMemo(
+        () => getColumns(setDeleteModal, acceptedByProgram),
+        [setDeleteModal, acceptedByProgram]
+    )
 
     React.useEffect(() => {
         setData(initialData ?? [])
