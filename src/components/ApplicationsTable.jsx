@@ -235,7 +235,6 @@ function TableCellViewer({ item, table }) {
     const isMobile = useIsMobile()
     const { user } = useUsers()
     const updateStatus = table?.options?.meta?.updateStatus;
-    const { loading } = useApplications;
     const assigneeOptions = table?.options?.meta?.assigneeOptions ?? [];
     const { createSchedule, updateSchedule, events } = useSchedules(item.id) // pass application id here
     const [status, setStatus] = React.useState(item.status)
@@ -583,7 +582,6 @@ function TableCellViewer({ item, table }) {
 
                 <DrawerFooter>
                     <Button onClick={handleSubmit}
-                        disabled={loading}
                         className="bg-[#378ADD] text-white">
                         Apply
                     </Button>
