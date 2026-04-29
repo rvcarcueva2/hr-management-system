@@ -5,7 +5,8 @@ import useAvatarUpload from "@/hooks/useAvatarUpload";
 import { FaPaperclip } from "react-icons/fa6";
 import useApply from "@/hooks/useApply";
 import Spinner from "./Spinner";
-import { toast } from 'sonner'
+import { toast } from 'sonner';
+import AvatarUpload from "./AvatarUpload"; 
 
 
 
@@ -89,17 +90,13 @@ const ApplyModal = ({ setShowModal, job, onApplySuccess }) => { // Props from Jo
                                         {/* Avatar */}
                                         <div className="flex-1  ">
                                             <div className="shrink-0 flex justify-center">
-                                                <div className="bg-gray-200 rounded-full w-24 h-24 border ">
-                                                    {avatarUrl ? (
-                                                        <img
-                                                            src={avatarUrl}
-                                                            alt="Avatar"
-                                                            className="w-full h-full rounded-full"
-                                                        />
-                                                    ) : (
-                                                        <div className="bg-gray-200 rounded-full w-24 h-24" />
-                                                    )}
-                                                </div>
+                                                <AvatarUpload
+                                                    userId={user?.id}
+                                                    isViewOnly={true}
+                                                    avatarUrl={user?.avatar_url}
+                                                    wrapperClassName="w-24 h-24 md:w-24"
+                                                    className="w-24 h-24"
+                                                />
                                             </div>
 
 
