@@ -6,6 +6,7 @@ import { MdOutlineLogout } from "react-icons/md";
 import { RiNotification3Line } from "react-icons/ri";
 import useAvatarUpload from "../hooks/useAvatarUpload";
 import useNotifications from "../hooks/useNotifications";
+import useUsers from "../hooks/useUsers";
 import AvatarUpload from "./AvatarUpload";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "./ui/button";
@@ -16,11 +17,14 @@ import { Separator } from "./ui/separator";
 const AdminNavBar = () => {
 
     const { user, logout } = useAuth();
+    const { user: currentUser } = useUsers();
     const { avatarUrl } = useAvatarUpload();
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showNotificaiton, setShowNotification] = useState(false);
-    const { notifications, clearNotifications } = useNotifications(user?.id);
+    const { notifications, clearNotifications } = useNotifications(user?.id, undefined, {
+        role: currentUser?.role,
+    });
     const [hasUnread, setHasUnread] = useState(false);
     const lastSeenKey = user?.id ? `notifications_last_seen:${user.id}` : null;
 
