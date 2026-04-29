@@ -3,7 +3,7 @@ import usePrograms from "../hooks/usePrograms"
 import useUsers from "../hooks/useUsers"
 import MentorListing from './MentorListing'
 import Spinner from "./Spinner"
-import Search from './Search'
+import MentorSearch from './MentorSearch'
 import CategoryDropdown from './CategoryDropdown'
 import Pagination from './Pagination'
 import JobType from './JobType'
@@ -44,7 +44,7 @@ const MentorListings = ({ isHome = false }) => {
 
         if (search.trim() !== '') {
             processed = processed.filter(program =>
-                program.title.toLowerCase().includes(search.toLowerCase()) ||
+                program.topic.toLowerCase().includes(search.toLowerCase()) ||
                 program.description?.toLowerCase().includes(search.toLowerCase()) ||
                 program.mentor?.display_name?.toLowerCase().includes(search.toLowerCase())
             );
@@ -82,7 +82,7 @@ const MentorListings = ({ isHome = false }) => {
                     {!isHome && (
                         <div className="flex flex-wrap gap-2 mb-6 items-center">
                             <JobType selectedType={selectedType} setSelectedType={setSelectedType} />
-                            <Search search={search} setSearch={setSearch} />
+                            <MentorSearch search={search} setSearch={setSearch} />
                             <CategoryDropdown selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
 
 
