@@ -4,7 +4,8 @@ import supabase from "../utils/supabaseClient";
 const DEFAULT_LIMIT = 5;
 const storageKeyForUser = (userId) => `notifications_cleared_at:${userId}`;
 
-const useNotifications = (userId, limit = DEFAULT_LIMIT) => {
+const useNotifications = (userId, limit = DEFAULT_LIMIT, options = {}) => {
+    const { role } = options;
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -24,26 +25,56 @@ const useNotifications = (userId, limit = DEFAULT_LIMIT) => {
                 const clearedAtRaw = localStorage.getItem(storageKeyForUser(userId));
                 const clearedAt = clearedAtRaw ? new Date(clearedAtRaw) : null;
 
-                const { data, error: fetchError } = await supabase
-                    .from("applications")
-                    .select(`
-                        id,
-                        created_at,
-                        updated_at,
-                        user_id,
-                        assigned,
-                        applicant:users!applications_user_id_fkey (
+                let data;
+                let fetchError;
+
+                if (role === "Mentor") {
+                    const mentorResponse = await supabase
+                        .from("apprentice")
+                        .select(`
                             id,
-                            display_name
-                        )
-                    `)
-                    .order("created_at", { ascending: false })
-                    .limit(limit);
+                            created_at,
+                            updated_at,
+                            applicant:users!apprentice_user_id_fkey (
+                                id,
+                                display_name
+                            ),
+                            program:programs!apprentice_program_id_fkey (
+                                id,
+                                mentor
+                            )
+                        `)
+                        .eq("program.mentor", userId)
+                        .order("created_at", { ascending: false })
+                        .limit(limit);
+
+                    data = mentorResponse.data;
+                    fetchError = mentorResponse.error;
+                } else {
+                    const response = await supabase
+                        .from("applications")
+                        .select(`
+                            id,
+                            created_at,
+                            updated_at,
+                            user_id,
+                            assigned,
+                            applicant:users!applications_user_id_fkey (
+                                id,
+                                display_name
+                            )
+                        `)
+                        .order("created_at", { ascending: false })
+                        .limit(limit);
+
+                    data = response.data;
+                    fetchError = response.error;
+                }
 
                 if (fetchError) throw fetchError;
 
                 const normalized = (data || []).map((item) => {
-                    const isAssignedToUser = item.assigned === userId;
+                    const isAssignedToUser = role !== "Mentor" && item.assigned === userId;
 
                     return {
                         id: item.id,
@@ -68,7 +99,7 @@ const useNotifications = (userId, limit = DEFAULT_LIMIT) => {
         };
 
         fetchNotifications();
-    }, [userId, limit]);
+    }, [userId, limit, role]);
 
     const clearNotifications = () => {
         if (userId) {
