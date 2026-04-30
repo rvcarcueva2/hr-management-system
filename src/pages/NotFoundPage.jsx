@@ -4,7 +4,7 @@ import { FaTriangleExclamation, FaChevronLeft } from 'react-icons/fa6'
 const NotFoundPage = () => {
     return (
         <>
-            <section class="text-center flex flex-col justify-center items-center h-[540px]">
+            <section class="text-center flex flex-col justify-center items-center h-135">
                 <FaTriangleExclamation className='text-[#378ADD] text-6xl mb-4' />
                 <h1 class="text-5xl font-bold mb-4">404 Not Found</h1>
                 <p class="text-xl mb-5">This page does not exist</p>
