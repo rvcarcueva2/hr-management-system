@@ -183,6 +183,54 @@ const useAuth = () => {
         }
     };
 
+    const resetPassword = async (email, redirectTo) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo,
+            });
+
+            if (error) {
+                setError(error.message);
+                return { data: null, error };
+            }
+
+            return { data, error: null };
+        } catch (err) {
+            const message = err?.message || "Failed to send reset email";
+            setError(message);
+            return { data: null, error: err };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updatePassword = async (newPassword) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { data, error } = await supabase.auth.updateUser({
+                password: newPassword,
+            });
+
+            if (error) {
+                setError(error.message);
+                return { data: null, error };
+            }
+
+            return { data, error: null };
+        } catch (err) {
+            const message = err?.message || "Failed to update password";
+            setError(message);
+            return { data: null, error: err };
+        } finally {
+            setLoading(false);
+        }
+    };
+
     
 
     return {
@@ -195,6 +243,8 @@ const useAuth = () => {
         logout,
         deactivateUser,
         reactivateUser,
+        resetPassword,
+        updatePassword,
     };
 };
 

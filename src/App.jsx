@@ -30,6 +30,8 @@ const AdminApprenticePage = lazy(() => import('./pages/AdminApprenticePage'))
 const AdmintTicketPage = lazy(() => import('./pages/AdmintTicketPage'))
 
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
+const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage'))
+const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 // Loader
@@ -88,7 +90,9 @@ function App() {
         <Route element={<AuthLayout />}>
           <Route element={<RequireGuest />}>
             <Route path='/auth/login' element={<LoginPage />} />
+            <Route path='/auth/forgot-password' element={<ForgotPasswordPage />} />
           </Route>
+          <Route path='/auth/reset-password' element={<ResetPasswordPage />} />
         </Route>
 
       </>
