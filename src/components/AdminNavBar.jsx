@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import { FaSearch } from "react-icons/fa";
@@ -7,6 +7,7 @@ import { RiNotification3Line } from "react-icons/ri";
 import useAvatarUpload from "../hooks/useAvatarUpload";
 import useNotifications from "../hooks/useNotifications";
 import useUsers from "../hooks/useUsers";
+import useApplications from "../hooks/useApplications";
 import AvatarUpload from "./AvatarUpload";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "./ui/button";
@@ -19,9 +20,12 @@ const AdminNavBar = () => {
     const { user, logout } = useAuth();
     const { user: currentUser } = useUsers();
     const { avatarUrl } = useAvatarUpload();
+    const { applications, loading: applicationsLoading } = useApplications();
     const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
     const [showNotificaiton, setShowNotification] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [showSearchResults, setShowSearchResults] = useState(false);
     const { notifications, clearNotifications } = useNotifications(user?.id, undefined, {
         role: currentUser?.role,
     });
@@ -47,6 +51,27 @@ const AdminNavBar = () => {
         setShowNotification(false);
         navigate(`/admin/admin-applications?applicant=${encodeURIComponent(applicantName)}`);
     };
+
+    const handleSearchSelect = (applicantName) => {
+        if (!applicantName) return;
+        setShowSearchResults(false);
+        setSearchQuery("");
+        navigate(`/admin/admin-applications?applicant=${encodeURIComponent(applicantName)}`);
+    };
+
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const searchResults = useMemo(() => {
+        if (!normalizedQuery) return [];
+        return applications
+            .filter((item) => {
+                const idMatch = item.id?.toString().toLowerCase().includes(normalizedQuery);
+                const nameMatch = item.applicant?.display_name
+                    ?.toLowerCase()
+                    .includes(normalizedQuery);
+                return idMatch || nameMatch;
+            })
+            .slice(0, 5);
+    }, [applications, normalizedQuery]);
 
     useEffect(() => {
         if (!lastSeenKey) return;
@@ -98,20 +123,78 @@ const AdminNavBar = () => {
                     <div className="flex h-20 items-center justify-between">
                         <div className="flex flex-1 mr-8 items-center justify-between md:items-stretch md:justify-between">
 
-                            <form onSubmit={(e) => e.preventDefault()}
-                                className=" flex items-center border border-gray-300 rounded-lg w-80 max-w-md">
-                                <button
-                                    type="submit"
-                                    className="px-3 text-gray-400 hover:text-gray-600 cursor-pointer"
+                            <div className="relative w-80 max-w-md">
+                                <form
+                                    onSubmit={(e) => e.preventDefault()}
+                                    className="flex items-center border border-gray-300 rounded-lg w-full"
                                 >
-                                    <FaSearch className="w-4 h-4" />
-                                </button>
-                                <input
-                                    type="text"
-                                    placeholder="Search jobs or application..."
-                                    className="flex-1 px-1 py-2 text-sm text-gray-800 bg-transparent outline-none"
-                                />
-                            </form>
+                                    <button
+                                        type="submit"
+                                        className="px-3 text-gray-400 hover:text-gray-600 cursor-pointer"
+                                    >
+                                        <FaSearch className="w-4 h-4" />
+                                    </button>
+                                    <input
+                                        type="text"
+                                        placeholder="Search application..."
+                                        value={searchQuery}
+                                        onChange={(e) => {
+                                            setSearchQuery(e.target.value);
+                                            setShowSearchResults(true);
+                                        }}
+                                        onFocus={() => setShowSearchResults(true)} // When focused show result
+                                        onBlur={() => setTimeout(() => setShowSearchResults(false), 150)}
+                                        className="flex-1 px-1 py-2 text-sm text-gray-800 bg-transparent outline-none"
+                                    />
+                                </form>
+
+                                {showSearchResults && normalizedQuery && (
+                                    <div className="absolute left-0 top-full mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-40">
+                                        {applicationsLoading ? (
+                                            <div className="px-3 py-4 text-sm text-gray-500">
+                                                Searching...
+                                            </div>
+                                        ) : searchResults.length === 0 ? (
+                                            <div className="px-3 py-4 text-sm text-gray-500">
+                                                No result.
+                                            </div>
+                                        ) : (
+                                            <div className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-transparent hover:scrollbar-thumb-muted-foreground/30 scrollbar-track-transparent">
+                                                {searchResults.map((item) => (
+                                                    <button
+                                                        key={item.id}
+                                                        type="button"
+                                                        onClick={() => handleSearchSelect(item.applicant?.display_name)}
+                                                        className="w-full flex items-center p-3 text-left hover:bg-gray-100 cursor-pointer"
+                                                    >
+                                                        <div className="ml-2">
+
+                                                            <AvatarUpload
+                                                                userId={item.applicant?.id}
+                                                                isViewOnly
+                                                                className="w-8 h-8"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm ">
+                                                                {item.applicant?.display_name ?? "Unknown"}
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                Application ID:
+
+                                                            </p>
+                                                            <p className="text-xs text-gray-500">
+                                                                {item.id}
+                                                            </p>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
                             <div className="md:ml-auto flex items-center gap-4">
                                 {/* Notification  */}
                                 <div className="relative inline-block text-left">
