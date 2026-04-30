@@ -30,8 +30,6 @@ const SalaryGradeDropdown = ({ selectedSalaryGrade, setSelectedSalaryGrade }) =>
         return grade > (userGrade || 0);
     });
 
-    const salary = user?.job?.salary
-    console.log(filteredSalaries)
 
     return (
         <>
