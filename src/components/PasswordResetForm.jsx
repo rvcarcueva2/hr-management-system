@@ -2,7 +2,7 @@ import { useState } from 'react'
 import useAuth from '../hooks/useAuth';
 import Logo from '../assets/images/recruitease_logo.svg'
 import { Link, useNavigate } from 'react-router-dom';
-
+import { FaChevronLeft } from 'react-icons/fa';
 
 const PasswordResetForm = () => {
 
@@ -46,7 +46,15 @@ const PasswordResetForm = () => {
             <div className=" flex items-center justify-center bg-white px-8 py-12 -mt-20">
                 <div className="w-full max-w-md">
 
-
+                    <div className='container mb-2 '>
+                        <Link
+                            to='/auth/login'
+                            className='text-gray-500 text-sm hover:text-gray-600 flex items-center group'
+                        >
+                            <FaChevronLeft className='mr-2 transition-transform duration-300 group-hover:-translate-x-1' />
+                            Back to Sign In
+                        </Link>
+                    </div>
                     <img
                         className="h-20 w-auto object-contain -ml-4 mt-8 mb-2"
                         src={Logo}
@@ -117,15 +125,6 @@ const PasswordResetForm = () => {
                         >
                             {loading ? 'Updating...' : 'Update password'}
                         </button>
-
-                        <div className="text-center">
-                            <Link
-                                to="/auth/login"
-                                className="text-sm text-[#378ADD] hover:underline"
-                            >
-                                Back to sign in
-                            </Link>
-                        </div>
 
 
                     </form>

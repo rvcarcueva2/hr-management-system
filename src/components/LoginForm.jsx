@@ -3,7 +3,6 @@ import useAuth from '../hooks/useAuth';
 import Logo from '../assets/images/recruitease_logo.svg'
 import { Link, useNavigate } from 'react-router-dom';
 import { FaChevronLeft } from 'react-icons/fa';
-import { FcGoogle } from "react-icons/fc";
 
 
 const LoginForm = () => {
@@ -118,7 +117,7 @@ const LoginForm = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-[#0F6E56] mt-2 text-white py-3 rounded-xl hover:shadow-md font-semibold cursor-pointer "
+                            className="w-full bg-[#0F6E56] text-white py-3 rounded-xl hover:shadow-md font-semibold cursor-pointer "
                         >
                             {loading ? 'Signing in...' : 'Sign In'}
                         </button>

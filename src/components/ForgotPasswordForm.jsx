@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import useAuth from '../hooks/useAuth';
 import Logo from '../assets/images/recruitease_logo.svg'
+import { MdEmail } from "react-icons/md";
+
 
 
 const ForgotPasswordForm = () => {
@@ -58,34 +60,48 @@ const ForgotPasswordForm = () => {
 
                         <div>
                             {/* Error */}
-
                             <div className="min-h-5 mt-3 mb-3 ">
                                 {error && (
                                     <p className="text-red-500 text-sm">{error}</p>
                                 )}
-                                {successMessage && (
-                                    <p className="text-green-600 text-sm">{successMessage}</p>
-                                )}
                             </div>
 
-                            {/* Email */}
-                            <label className="block mt-2 text-sm font-medium  text-gray-600 mb-1">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                className="w-full px-4 py-3 border rounded-xl focus:outline-none "
-                                placeholder="Enter your email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
+                            {/* Email input or success message */}
+                            {successMessage ? (
+                                <div className="w-full px-4 py-3 border border-green-300 rounded-xl bg-green-50 text-green-700 text-sm text-center">
+                                    
+                                    <p className="font-semibold text-md mt-2">Password reset link has been sent</p>
+                                    <p className='mb-2'>Please check your email.</p>
+                                </div>
+                            ) : (
+                                <>
+                                    <label className="block mt-2 text-sm font-medium text-gray-600 mb-1">
+                                        Email
+                                    </label>
+                                    <input
+                                        type="email"
+                                        className="w-full px-4 py-3 border rounded-xl focus:outline-none "
+                                        placeholder="Enter your email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
 
-                            />
+
+                                    {/* Button */}
+                                    <button
+                                        type="submit"
+                                        disabled={loading || !!successMessage}
+                                        className="w-full bg-[#0F6E56] mt-4 text-white py-3 rounded-xl hover:shadow-md font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-default"
+                                    >
+                                        {loading ? 'Sending link...' : 'Send reset link'}
+                                    </button>
+                                </>
+                            )}
                         </div>
 
-
-                        <div className='-mt-2 text-center'>
-                            <span className='text-sm'>
+                        <div className='mt-4 text-center'>
+                            <span className='text-sm text-gray-800'>
                                 Remember your password?
                             </span>
                             <a
@@ -95,15 +111,6 @@ const ForgotPasswordForm = () => {
                             </a>
                         </div>
 
-
-                        {/* Button */}
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-[#0F6E56] mt-2 text-white py-3 rounded-xl hover:shadow-md font-semibold cursor-pointer "
-                        >
-                            {loading ? 'Sending link...' : 'Send reset link'}
-                        </button>
 
 
                     </form>
