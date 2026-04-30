@@ -1,32 +1,32 @@
 import { useState } from 'react'
 import useAuth from '../hooks/useAuth';
 import Logo from '../assets/images/recruitease_logo.svg'
-import { Link, useNavigate } from 'react-router-dom';
-import { FaChevronLeft } from 'react-icons/fa';
-import { FcGoogle } from "react-icons/fc";
 
 
-const LoginForm = () => {
+const ForgotPasswordForm = () => {
 
-    const { login, loading, error } = useAuth()
+    const { resetPassword, loading, error } = useAuth()
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('')
-    const navigate = useNavigate()
+    const [successMessage, setSuccessMessage] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        setSuccessMessage('');
+
         try {
-            const { error } = await login(email, password);
+            const redirectTo = `${window.location.origin}/auth/reset-password`;
+            const { error } = await resetPassword(email, redirectTo);
+
             if (error) {
                 console.error(error.message);
                 return;
             }
+
+            setSuccessMessage("Check your email for the reset link.");
         } catch (err) {
             console.error("Unexpected error:", err.message);
         }
-
-        return navigate('/');
 
     };
 
@@ -37,16 +37,6 @@ const LoginForm = () => {
             <div className=" flex items-center justify-center bg-white px-8 py-12 -mt-20">
                 <div className="w-full max-w-md">
 
-                    <div className='container mb-2 '>
-                        <Link
-                            to='/'
-                            className='text-gray-500 text-sm hover:text-gray-600 flex items-center group'
-                        >
-                            <FaChevronLeft className='mr-2 transition-transform duration-300 group-hover:-translate-x-1' />
-                            Back to Home Page
-                        </Link>
-                    </div>
-
 
                     <img
                         className="h-20 w-auto object-contain -ml-4 mt-8 mb-2"
@@ -55,10 +45,10 @@ const LoginForm = () => {
                     />
 
                     <h2 className="text-4xl font-bold text-gray-800 mb-2">
-                        Welcome Back
+                        Forgot your password?
                     </h2>
                     <p className="text-gray-500">
-                        Sign in to your account
+                        Enter your email address and we'll send you a link to reset your password.
                     </p>
 
 
@@ -72,6 +62,9 @@ const LoginForm = () => {
                             <div className="min-h-5 mt-3 mb-3 ">
                                 {error && (
                                     <p className="text-red-500 text-sm">{error}</p>
+                                )}
+                                {successMessage && (
+                                    <p className="text-green-600 text-sm">{successMessage}</p>
                                 )}
                             </div>
 
@@ -90,26 +83,15 @@ const LoginForm = () => {
                             />
                         </div>
 
-                        {/* Password */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-600 mb-1">
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                className="w-full px-4 py-3 border rounded-xl focus:outline-none "
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
 
-                        <div className='-mt-2 text-end'>
-                            <a 
-                            href='/auth/forgot-password'
-                            className='text-sm text-gray-500 hover:underline cursor-pointer'>
-                                Forgot Password?
+                        <div className='-mt-2 text-center'>
+                            <span className='text-sm'>
+                                Remember your password?
+                            </span>
+                            <a
+                                href='/auth/login'
+                                className='text-sm ml-1 text-[#378ADD] hover:underline cursor-pointer '>
+                                Sign In
                             </a>
                         </div>
 
@@ -120,7 +102,7 @@ const LoginForm = () => {
                             disabled={loading}
                             className="w-full bg-[#0F6E56] mt-2 text-white py-3 rounded-xl hover:shadow-md font-semibold cursor-pointer "
                         >
-                            {loading ? 'Signing in...' : 'Sign In'}
+                            {loading ? 'Sending link...' : 'Send reset link'}
                         </button>
 
 
@@ -133,4 +115,4 @@ const LoginForm = () => {
     );
 }
 
-export default LoginForm
+export default ForgotPasswordForm
