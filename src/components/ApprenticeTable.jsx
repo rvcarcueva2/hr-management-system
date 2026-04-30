@@ -52,8 +52,6 @@ import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
@@ -77,16 +75,7 @@ import {
 import {
     Tabs,
     TabsContent,
-    TabsList,
-    TabsTrigger,
 } from "@/components/ui/tabs"
-
-
-
-import { useSchedules } from "@/hooks/useSchedules"
-import useStorageUrl from '@/hooks/useStorageUrl'
-import useUsers from "@/hooks/useUsers"
-import { Popover, PopoverTrigger } from "@/components/ui/popover"
 
 
 function DragHandle({ id }) {

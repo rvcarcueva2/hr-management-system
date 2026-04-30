@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import supabase from '../utils/supabaseClient'
 import ProfileForm from '@/components/ProfileForm'
 import { useLoaderData } from 'react-router-dom'

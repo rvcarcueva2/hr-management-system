@@ -22,11 +22,8 @@ import {
     IconChevronRight,
     IconChevronsLeft,
     IconChevronsRight,
-    IconDotsVertical,
     IconGripVertical,
     IconLayoutColumns,
-    IconPlus,
-    IconTrashFilled,
     IconRefresh
 } from "@tabler/icons-react"
 import {
@@ -58,8 +55,6 @@ import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
@@ -93,7 +88,6 @@ import { useSchedules } from "@/hooks/useSchedules"
 import useStorageUrl from '@/hooks/useStorageUrl'
 import useUsers from "@/hooks/useUsers"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import useApplications from "@/hooks/useApplications"
 
 
 const tabs = ['All', 'Pending', 'Scheduled', 'Accepted', 'Rejected'];
