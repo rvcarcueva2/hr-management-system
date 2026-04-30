@@ -31,10 +31,10 @@ const Navbar = () => {
     const role = currentUser?.role;
 
     const dropdown = [ // Data-driven UI approach,
-        ...(role === "Admin" || role === "Reviewer" ? [{ label: "Admin", icon: BsBarChartFill, size: 15, to: "/admin" }] : []),
+        ...(role === "Admin" || role === "Reviewer" ? [{ label: "Admin", icon: BsBarChartFill, size: 15, to: "/admin", external: true }] : []),
         { label: "Profile", icon: FaUser, size: 15, to: "/profile" },
         { label: "Application", icon: IoMdDocument, size: 17, to: "/my-application" },
-        ...(role === "Mentor" ? [{ label: "Mentorship", icon: FaStar, size: 16, to: "/admin/admin-mentorship" }] : []),
+        ...(role === "Mentor" ? [{ label: "Mentorship", icon: FaStar, size: 16, to: "/admin/admin-mentorship", external: true }] : []),
         { label: "Logout", icon: MdOutlineLogout, size: 20, action: handleLogout }
 
     ]
@@ -111,12 +111,15 @@ const Navbar = () => {
                                                     const Icon = item.icon; // Defined variable from dropdown object
 
                                                     const handleClick = () => {
-                                                        if (item.to) {
+                                                        if (item.external && item.to) {
+                                                            navigate(item.to);
+                                                            setTimeout(() => window.location.reload(), 50);
+                                                        } else if (item.to) {
                                                             navigate(item.to);
                                                         } else if (item.action) {
                                                             item.action();
                                                         }
-                                                        setShowDropdown(false)
+                                                        setShowDropdown(false);
                                                     }
 
                                                     return (
