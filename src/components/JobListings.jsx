@@ -7,12 +7,13 @@ import CategoryDropdown from './CategoryDropdown'
 import Pagination from './Pagination'
 import JobType from './JobType'
 import SalaryGradeDropdown from './SalaryGradeDropdown'
+import useUsers from '@/hooks/useUsers'
 
 
 
 const JobListings = ({ isHome = false }) => {
     const { jobs, loading } = useJobs(); // Hook loader
-
+    const { user } = useUsers();
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedType, setSelectedType] = useState('')
     const [search, setSearch] = useState('');
@@ -23,7 +24,15 @@ const JobListings = ({ isHome = false }) => {
 
     // Filter
     const filteredJobs = useMemo(() => {
-        const visibleJobs = jobs.filter((job) => job.is_visible === true);
+        const visibleJobs = jobs.filter((job) => {
+            if (!job.is_visible) return false;
+            // Only apply salary filter if user data is available
+            if (user?.job?.salary != null) {
+                return job.salary > user.job.salary;
+            }
+            return true; // show all visible jobs while user is loading
+        });
+
         let processed = visibleJobs;
 
         //filter() is an array method used to create a new array containing only the elements that pass a condition.
@@ -31,16 +40,10 @@ const JobListings = ({ isHome = false }) => {
             processed = processed.filter(job => job.category === selectedCategory); // Each parameter (job) from job.category match the selectedCategory (in CategoryDropdown line 72);
         }
 
-        if (selectedCategory === 'All Categories') {
-            job => job.category
-        }
 
         if (selectedType && selectedType !== 'All Types') {
             processed = processed.filter(
                 job => job.type === selectedType);
-        }
-        if (selectedType == 'All Types') {
-            processed = processed.filter(job => job.type);
         }
 
         if (search.trim() !== '') {
@@ -51,7 +54,7 @@ const JobListings = ({ isHome = false }) => {
             );
         }
 
-    
+
         if (selectedSalaryGrade && selectedSalaryGrade !== 'All Salary Grades') {
             processed = processed.filter(
                 job => job.salary === selectedSalaryGrade);
@@ -64,7 +67,7 @@ const JobListings = ({ isHome = false }) => {
 
         return processed;
 
-    }, [jobs, selectedCategory, selectedType, search, selectedSalaryGrade]);
+    }, [jobs, selectedCategory, selectedType, search, selectedSalaryGrade, user]);
 
 
     // Pagination
@@ -103,6 +106,10 @@ const JobListings = ({ isHome = false }) => {
                     {/* Jobs */}
                     {loading ? (
                         <Spinner loading={loading} />
+                    ) : displayJobs.length === 0 ? (
+                        <div className="text-center mt-15 text-gray-500 py-10">
+                            <p className="text-sm mt-2">There are no job openings above your current salary grade.</p>
+                        </div>
                     ) : (
                         <div className={`grid grid-cols-3 md:${isHome ? 'grid-cols-3' : 'grid-cols-2'} gap-6`}>
                             {displayJobs.map((job) => (

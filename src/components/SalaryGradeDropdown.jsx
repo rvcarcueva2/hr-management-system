@@ -1,10 +1,11 @@
+import useUsers from '@/hooks/useUsers';
 import { useState } from 'react'
 import { TbBinaryTree2Filled } from "react-icons/tb";
 
 
 
 const SalaryGradeDropdown = ({ selectedSalaryGrade, setSelectedSalaryGrade }) => {
-
+    const { user } = useUsers();
     const [showDropdown, setShowDropdown] = useState(false)
 
     const listClass = (salary) => {
@@ -21,6 +22,17 @@ const SalaryGradeDropdown = ({ selectedSalaryGrade, setSelectedSalaryGrade }) =>
         "SG 28",
         "SG 29"
     ]
+
+    const filteredSalaries = salaries.filter(item => {
+        const grade = parseInt(item.replace("SG ", ""), 10);
+        const userGrade = parseInt(user?.job?.salary?.replace("SG ", ""), 10);
+
+        return grade > (userGrade || 0);
+    });
+
+    const salary = user?.job?.salary
+    console.log(filteredSalaries)
+
     return (
         <>
             <div className="relative inline-block ">
@@ -44,7 +56,7 @@ const SalaryGradeDropdown = ({ selectedSalaryGrade, setSelectedSalaryGrade }) =>
                     <ul className="py-2">
 
                         {/* Salary Grades */}
-                        {salaries.map((salary, index) => (
+                        {filteredSalaries.map((salary, index) => (
                             <li
                                 key={index}
                                 onClick={() => setSelectedSalaryGrade(salary)}
