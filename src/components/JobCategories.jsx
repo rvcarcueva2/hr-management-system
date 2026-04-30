@@ -1,13 +1,21 @@
 import useJobs from "../hooks/useJobs"
-import { FaCode, FaUsers, FaPlay, FaChartLine, FaChartPie, FaBook , FaHandshake, FaHeadset } from 'react-icons/fa'
+import { FaCode, FaUsers, FaPlay, FaChartLine, FaChartPie, FaBook, FaHandshake, FaHeadset } from 'react-icons/fa'
 import JobCategoryCard from './JobCategoryCard'
+import useUsers from '@/hooks/useUsers'
 
 const JobCategories = () => {
     const { jobs } = useJobs() // Hook loader
-
+    const { user } = useUsers();
+    const visibleJobs = jobs.filter((job) => {
+        if (!job.is_visible) return false;
+        // Only apply salary filter if user data is available
+        if (user?.job?.salary != null) {
+            return job.salary > user.job.salary;
+        }
+        return true; // show all visible jobs while user is loading
+    });
     const countOpenings = (target) => {
-       
-        return jobs.filter(job => job.category === target).length;
+        return visibleJobs.filter(job => job.category === target).length; // count from filtered list
     }
 
     return (
@@ -50,7 +58,7 @@ const JobCategories = () => {
                         openings={countOpenings('Data & Analytics')}
                     />
                     <JobCategoryCard
-                        icon={FaBook }
+                        icon={FaBook}
                         label="Knowledge & Developement"
                         openings={countOpenings('Knowledge & Developement')}
                     />

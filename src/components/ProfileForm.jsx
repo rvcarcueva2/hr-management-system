@@ -15,7 +15,8 @@ import CompleteModal from './CompleteModal';
 const ProfileForm = ({ profile }) => {
     const { id } = useParams();
     const { user } = useUsers();
-    const isOwnProfile = user?.id === id;
+    const profileId = id || user?.id;
+    const isOwnProfile = user?.id === profileId;
     const isReviewer = user?.role === 'Reviewer';
     const isMentor = user?.role === 'Mentor';
     const canViewEnrollments = isOwnProfile || isReviewer || isMentor;
