@@ -5,6 +5,7 @@ import MentorListings from '@/components/MentorListings'
 import ViewAllJobsButton from '../components/ViewAllJobsButton'
 import ViewAllMentorsButton from '@/components/ViewAllMentorsButton'
 import ApplyMentor from '@/components/ApplyMentor'
+import BotpressChat from '@/components/BotpressChat'
 
 
 const HomePage = () => {
@@ -14,6 +15,7 @@ const HomePage = () => {
             <Hero />
 
             <div className='max-w-7xl mx-auto'>
+                <BotpressChat />
                 <JobCategories />
                 <JobListings isHome={true} />
                 <ViewAllJobsButton />
