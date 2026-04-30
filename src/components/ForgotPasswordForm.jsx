@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import useAuth from '../hooks/useAuth';
 import Logo from '../assets/images/recruitease_logo.svg'
-import { MdEmail } from "react-icons/md";
 
 
 

@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { useSchedules } from '../hooks/useSchedules'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import {  CardHeader, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { IconClock, IconUser, IconLink, IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
 import Spinner from './Spinner'
@@ -20,7 +20,6 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerDescription,
   DrawerFooter,
   DrawerClose,
 } from '@/components/ui/drawer'
