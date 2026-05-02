@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Image from '../assets/images/about-image.png'
 import Dev from '../assets/images/about-dev-image.png'
 import { IoIosDocument } from "react-icons/io";
@@ -13,6 +14,9 @@ import Reveal from '@/components/Reveal';
 
 
 const AboutPage = () => {
+    useEffect(() => {
+        document.title = 'About | RecruitEase'
+    }, []);
 
     return (
         <>

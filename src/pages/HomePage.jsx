@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Hero from '../components/Hero'
 import JobCategories from '../components/JobCategories'
 import JobListings from '../components/JobListings'
@@ -9,8 +10,12 @@ import BotpressChat from '@/components/BotpressChat'
 
 
 const HomePage = () => {
+    useEffect(() => {
+        document.title = 'RecruitEase'
+    }, []);
 
     return (
+
         <>
             <Hero />
 

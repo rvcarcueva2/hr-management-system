@@ -2,7 +2,7 @@ import supabase from '../utils/supabaseClient'
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link, useLoaderData } from 'react-router-dom'
-import { FaChevronLeft} from 'react-icons/fa';
+import { FaChevronLeft } from 'react-icons/fa';
 import { FaLightbulb } from "react-icons/fa6";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import AvatarUpload from "../components/AvatarUpload";
@@ -10,6 +10,10 @@ import ApplyApprenticeModal from '@/components/ApplyApprenticeModal';
 import useApprentice from '@/hooks/useApprentice';
 
 const MentorPage = () => {
+    useEffect(() => {
+        document.title = 'Mentor | RecruitEase'
+    }, []);
+
     const { id } = useParams();
     const program = useLoaderData(); // useLoaderData is the programLoader
     const [showModal, setShowModal] = useState(false);
