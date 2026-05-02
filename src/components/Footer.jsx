@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
-import { FaChevronRight } from 'react-icons/fa'
+import { FaChevronRight, FaLinkedin } from 'react-icons/fa'
+import { FaGithub } from "react-icons/fa";
 import Logo from '../assets/images/recruitease_logo.svg'
+
 
 const Footer = () => {
     return (
@@ -10,13 +12,17 @@ const Footer = () => {
 
                     {/* Logo */}
                     <div className=" flex justify-center lg:justify-start">
-                        <img
-                            src={Logo}
-                            alt="RecruitEase"
-                            width={136}
-                            height={136}
-                            className="rounded-full w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28"
-                        />
+                        <a
+                            href='/'>
+
+                            <img
+                                src={Logo}
+                                alt="RecruitEase"
+                                width={136}
+                                height={136}
+                                className="rounded-full w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28"
+                            />
+                        </a>
                     </div>
 
                     {/* Newsletter */}
@@ -44,12 +50,12 @@ const Footer = () => {
                     {/* Links */}
                     <div className=" flex flex-col items-center lg:items-start">
                         <ul className="text-base font space-y-2 text-center lg:text-left">
-                            {["Home", "Jobs", "About", "News"].map((item) => (
+                            {["Jobs", "Mentors", "About"].map((item) => (
                                 <li key={item}>
-                                    <Link href={`/${item.toLowerCase()}`} className="relative group">
+                                    <Link to={`/${item.toLowerCase()}`} className="relative group">
                                         <span className="relative">
                                             {item}
-                                            <span className="absolute left-1/2 -bottom-1 w-0 h-[2px] bg-[#378ADD] transition-all duration-300 group-hover:w-full group-hover:-translate-x-1/2"></span>
+                                            <span className="absolute left-1/2 -bottom-1 w-0 h-0.5 bg-[#378ADD] transition-all duration-300 group-hover:w-full group-hover:-translate-x-1/2"></span>
                                         </span>
                                     </Link>
                                 </li>
@@ -61,6 +67,12 @@ const Footer = () => {
                     <div className=" flex flex-col items-center lg:items-start">
                         <h4 className=" mb-2">Follow Me</h4>
                         <div className="flex items-center gap-2">
+                            <a href="https://www.linkedin.com/in/reycel-carcueva/" target='_blank'>
+                                <FaLinkedin className='text-2xl text-[#0A66C2]' />
+                            </a>
+                            <a href='https://github.com/rvcarcueva2' target='_blank'>
+                                <FaGithub className='text-2xl' />
+                            </a>
 
                         </div>
                     </div>

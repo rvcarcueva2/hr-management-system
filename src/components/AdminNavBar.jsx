@@ -205,10 +205,17 @@ const AdminNavBar = () => {
                                             setShowNotification(prev => !prev);
                                         }}
                                         className="relative border rounded-full p-2.5 green-600/20 cursor-pointer">
-                                        <RiNotification3Line className="text-xl text-[#0F6E56]" />
-                                        {hasUnread && (
-                                            <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#378ADD]" />
-                                        )}
+
+                                        <div className="relative">
+                                            <RiNotification3Line className="text-xl text-[#0F6E56]" />
+
+                                            {hasUnread && (
+                                                <span className="absolute -top-2 -right-3 flex size-3">
+                                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#378ADD] opacity-75"></span>
+                                                    <span className="relative inline-flex size-3 rounded-full bg-[#378ADD]"></span>
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <div
