@@ -9,6 +9,11 @@ import useCourses from '../hooks/useCourses';
 import EnrollModal from '@/components/EnrollModal';
 
 const JobPage = () => {
+
+    useEffect(() => {
+        document.title = 'Job | RecruitEase'
+    }, []);
+
     const { id } = useParams();
     const job = useLoaderData(); // useLoaderData is the jobLoader
     const { courses } = useCourses(id);
@@ -116,7 +121,7 @@ const JobPage = () => {
 
                                 <div className='bg-white p-6 rounded-lg border shadow-md mt-6'>
 
-                                    
+
                                     <h3 className='text-[#0d624d] text-lg font-bold  mb-6'>
                                         Job Description
                                     </h3>
