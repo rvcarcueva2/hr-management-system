@@ -18,6 +18,7 @@ const MentorPage = lazy(() => import('./pages/MentorPage'))
 const MentorsPage = lazy(() => import('./pages/MentorsPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const MyApplicationPage = lazy(() => import('./pages/MyApplicationPage'))
+const AboutPage = lazy(() => import('./pages/AboutPage'))
 
 const AdminPage = lazy(() => import('./pages/AdminDashboardPage'))
 const AdminApplicationsPage = lazy(() => import('./pages/AdminApplicationsPage'))
@@ -62,6 +63,7 @@ function App() {
             <Route path='jobs/:id' element={<JobPage />} loader={jobLoader} />
             <Route path='mentors' element={<MentorsPage />} />
             <Route path='programs/:id' element={<MentorPage />} loader={programLoader} />
+            <Route path='about' element={<AboutPage />} />
             <Route path='profile' element={<ProfilePage />} loader={profileLoader} />
             <Route path='profile/:id' element={<ProfilePage />} loader={profileLoader} />
             <Route path='my-application' element={<MyApplicationPage />} />
