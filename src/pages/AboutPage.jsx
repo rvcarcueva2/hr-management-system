@@ -52,7 +52,7 @@ const AboutPage = () => {
                     </Reveal>
                     <Reveal animation="animate-fade-in-up">
                         <p>
-                            RecruitEase brings your entire internal hiring process into one place.
+                            RecruitEase brings your internal hiring process into one place.
                         </p>
                     </Reveal>
                     <div className='flex flex-row justify-evenly flex-wrap mt-10 '>
