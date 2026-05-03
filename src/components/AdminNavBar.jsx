@@ -149,7 +149,7 @@ const AdminNavBar = () => {
                                 </form>
 
                                 {showSearchResults && normalizedQuery && (
-                                    <div className="absolute left-0 top-full mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-40">
+                                    <div className="absolute left-0 top-full w-full bg-white border border-gray-200 rounded-lg shadow-lg z-40">
                                         {applicationsLoading ? (
                                             <div className="px-3 py-4 text-sm text-gray-500">
                                                 Searching...
