@@ -1,16 +1,35 @@
-# React + Vite
+# Overview
+This application was made with React and Vite. RecruitEase is an internal mobility management system that improves tracking of job applications. It also gives employees an opportunity to learn and take ownership of their next career by giving them a learning path which they can take before they apply for the position. RecruitEase empoewers your HR with fast and reliable system they can use to shift careers with Ease.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+RecruitEase has the following features:
+- Applications Management
+- Jobs and Mentorship Postings
+- Dashboard
+- Calendar
+- Access Control
+- AI Assistant
 
-Currently, two official plugins are available:
+# Getting Started
+1. Install the packages
+```
+npm install
+```
+2. Build the application
+```
+npm run build
+```
+3. Run the development server
+```
+npm run dev
+```
+Open http://localhost:3000 with your browser to see the result.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Contact me to see the live demo through:
+- LinkedIn (Reycel John Emmanuel Carcueva)
+- Email (reycelvejano24@gmail.com)
 
-## React Compiler
+Live Link:
+https://recruitease-dev.vercel.app/about
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+My Portfolio:
+https://reycelcarcueva.com
