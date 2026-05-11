@@ -15,9 +15,9 @@ import { FaStar } from "react-icons/fa";
 
 const Navbar = () => {
 
-    const { logout } = useAuth()
-    const { user: currentUser } = useUsers()
-    const navigate = useNavigate()
+    const { logout, user: currentUser } = useAuth();
+    const { user: userInformation } = useUsers();
+    const navigate = useNavigate();
     const [showDropdown, setShowDropdown] = useState(false);
 
     const handleLogout = async () => {
@@ -28,7 +28,8 @@ const Navbar = () => {
         navigate("/auth/login");
     };
 
-    const role = currentUser?.role;
+    const role = userInformation?.role;
+    const displayName = currentUser?.user_metadata?.display_name;  // ← same
 
     const dropdown = [ // Data-driven UI approach,
         ...(role === "Admin" || role === "Reviewer" ? [{ label: "Admin", icon: BsBarChartFill, size: 15, to: "/admin", external: true }] : []),
@@ -89,7 +90,7 @@ const Navbar = () => {
                                             className="flex items-center gap-2 cursor-pointer"
                                         >
                                             <span className="text-[#0F6E56] font-medium">
-                                                {currentUser?.display_name}
+                                                {displayName}
                                             </span>
 
                                             <FaChevronDown
