@@ -1,5 +1,5 @@
 # Overview
-This application was made with React and Vite. RecruitEase is an internal mobility management system that improves tracking of job applications. It also gives employees an opportunity to learn and take ownership of their next career by giving them a learning path which they can take before they apply for the position. RecruitEase empoewers your HR with fast and reliable system they can use to shift careers with Ease.
+This application was made with React and Vite. RecruitEase is an internal mobility management system that improves tracking of job applications. It also gives employees an opportunity to learn and take ownership of their next career by giving them a learning path which they can take before they apply for the position. RecruitEase empowers your HR with fast and reliable system they can use to shift careers with Ease.
 
 RecruitEase has the following features:
 - Applications Management
