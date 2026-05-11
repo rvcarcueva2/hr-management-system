@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
 import Spinner from './components/Spinner';
 import { RequireAuth, RequireGuest, RequireRole } from './components/RouteGuards';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 
 // Layouts
@@ -107,6 +108,7 @@ function App() {
     <>
       <Suspense fallback={<Spinner loading />}>
         <RouterProvider router={router} />
+        <SpeedInsights />
       </Suspense>
     </>
   )
