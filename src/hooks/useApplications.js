@@ -15,37 +15,41 @@ const useApplications = () => {
     useEffect(() => {
         const fetchApplications = async () => {
             try {
-                const [{ data, error }, { data: assigneeOptions, error: assigneeError }] = await Promise.all([
+                const [
+                    { data, error },
+                    { data: assigneeOptions, error: assigneeError }
+                ] = await Promise.all([
                     supabase
                         .from('applications')
                         .select(`
-                    id,
-                    status,
-                    resume_url,
-                    cover_letter_url,
-                    created_at,
-                    updated_at,
-                    job:jobs!applications_job_id_fkey (
-                        title,
-                        site
-                    ),
-                    applicant:users!applications_user_id_fkey (
                         id,
-                        employee_id,
-                        email,
-                        display_name
-                    ),
-                    reviewer:users!applications_reviewer_id_fkey (
-                        id,
-                        display_name
-                    ),
-                    assigned:users!applications_assigned_fkey (
-                        id,
-                        display_name
-                    )
-                `)
-                        .neq('job_id', 47) // Except job_id 47
+                        status,
+                        resume_url,
+                        cover_letter_url,
+                        created_at,
+                        updated_at,
+                        job:jobs!applications_job_id_fkey (
+                            title,
+                            site
+                        ),
+                        applicant:users!applications_user_id_fkey (
+                            id,
+                            employee_id,
+                            email,
+                            display_name
+                        ),
+                        reviewer:users!applications_reviewer_id_fkey (
+                            id,
+                            display_name
+                        ),
+                        assigned:users!applications_assigned_fkey (
+                            id,
+                            display_name
+                        )
+                    `)
+                        .neq('job_id', 47)
                         .order('created_at', { ascending: false }),
+
                     supabase
                         .from('users')
                         .select('id, display_name')
@@ -57,6 +61,7 @@ const useApplications = () => {
 
                 setApplications(data || []);
                 setAssigneeOptions(assigneeOptions || []);
+
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -66,50 +71,37 @@ const useApplications = () => {
 
         fetchApplications();
 
-        const channel = supabase
-            .channel("applications-realtime")
-            .on(
-                "postgres_changes",
-                {
-                    event: "UPDATE",
-                    schema: "public",
-                    table: "applications",
-                    filter: "job_id=neq.47",
-                },
-                payload => {
-                    const updated = payload?.new;
-                    if (!updated || updated.job_id === 47) return;
+        const setup = async () => {
+            await supabase.removeAllChannels();
 
-                    setApplications(prev =>
-                        prev.map(app => {
-                            if (app.id !== updated.id) return app;
+            const channel = supabase
+                .channel(`applications-${Date.now()}`)
+                .on(
+                    "postgres_changes",
+                    {
+                        event: "*",
+                        schema: "public",
+                        table: "applications",
+                    },
+                    () => {
+                        fetchApplications();
+                    }
+                )
+                .subscribe();
 
-                            const reviewerOption = updated.reviewer_id
-                                ? assigneeOptionsRef.current.find(u => u.id === updated.reviewer_id)
-                                : null;
-                            const assignedOption = updated.assigned
-                                ? assigneeOptionsRef.current.find(u => u.id === updated.assigned)
-                                : null;
+            return channel;
+        };
 
-                            return {
-                                ...app,
-                                status: updated.status ?? app.status,
-                                updated_at: updated.updated_at ?? app.updated_at,
-                                reviewer: updated.reviewer_id === null
-                                    ? null
-                                    : reviewerOption || app.reviewer,
-                                assigned: updated.assigned === null
-                                    ? null
-                                    : assignedOption || app.assigned,
-                            };
-                        })
-                    );
-                }
-            )
-            .subscribe();
+        let channel;
+
+        setup().then((c) => {
+            channel = c;
+        });
 
         return () => {
-            supabase.removeChannel(channel);
+            if (channel) {
+                supabase.removeChannel(channel);
+            }
         };
     }, []);
 
