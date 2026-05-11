@@ -95,7 +95,6 @@ import {
 
 } from "@/components/ui/card"
 
-import useJobs from "@/hooks/useJobs"
 import useCourses from "@/hooks/useCourses"
 
 
@@ -117,7 +116,7 @@ function DragHandle({ id }) {
     )
 }
 
-const getColumns = (setDeleteModal) => [
+const getColumns = (setDeleteModal, updateJob, updateCourses, updating) => [
     {
         id: "drag",
         header: () => null,
@@ -152,7 +151,14 @@ const getColumns = (setDeleteModal) => [
     {
         accessorKey: "title",
         header: "Title",
-        cell: ({ row }) => <TableCellViewer item={row.original} />,
+        cell: ({ row }) => (
+            <TableCellViewer
+                item={row.original}
+                updateJob={updateJob}
+                updateCourses={updateCourses}
+                updating={updating}
+            />
+        ),
         enableHiding: false,
     },
     {
@@ -243,9 +249,8 @@ function DraggableRow({ row }) {
     )
 }
 
-function TableCellViewer({ item }) {
+function TableCellViewer({ item, updateJob, updateCourses, updating }) {
     const isMobile = useIsMobile()
-    const { updateJob, updateCourses, loading } = useJobs()
     const [open, setOpen] = React.useState(false)
     const [title, setTitle] = React.useState(item.title);
     const [type, setType] = React.useState(item.type);
@@ -256,6 +261,24 @@ function TableCellViewer({ item }) {
     const [isVisible, setIsVisible] = React.useState(Boolean(item.is_visible));
     const [courses, setCourses] = React.useState([]);
     const { courses: existingCourses, loading: coursesLoading } = useCourses(item.id)
+
+    React.useEffect(() => {
+        setTitle(item.title)
+        setType(item.type)
+        setCategory(item.category)
+        setSalary(item.salary)
+        setSite(item.site)
+        setDescription(item.description)
+        setIsVisible(Boolean(item.is_visible))
+    }, [
+        item.title,
+        item.type,
+        item.category,
+        item.salary,
+        item.site,
+        item.description,
+        item.is_visible,
+    ])
     React.useEffect(() => {
         if (coursesLoading) return  
         if (existingCourses.length === 0) return
@@ -299,7 +322,7 @@ function TableCellViewer({ item }) {
 
         toast.success('Job updated successfully!')
         setOpen(false)
-        setTimeout(() => window.location.reload(), 1500)
+       
     }
 
 
@@ -475,9 +498,9 @@ function TableCellViewer({ item }) {
                 <DrawerFooter>
                     <Button
                         onClick={handleSubmit}
-                        disabled={loading}
+                        disabled={updating}
                         className="bg-[#378ADD] text-white">
-                        {loading ? "Applying changes..." : "Apply"}
+                        {updating ? "Applying changes..." : "Apply"}
                     </Button>
                     <DrawerClose asChild>
                         <Button variant="outline" className={`cursor-pointer`}>Cancel</Button>
@@ -488,10 +511,9 @@ function TableCellViewer({ item }) {
     )
 }
 
-function AddJobDrawer() {
+function AddJobDrawer({ submitJob, updateCourses, submitting }) {
     const isMobile = useIsMobile()
     const [open, setOpen] = useState(false);
-    const { submitJob, updateCourses, submitting } = useJobs()
 
 
     const [formData, setFormData] = useState({
@@ -571,9 +593,6 @@ function AddJobDrawer() {
             toast.success("Job posted successfully")
             setOpen(false)
 
-            setTimeout(() => {
-                window.location.reload()
-            }, 1500)
 
         } else {
             toast.error(result.error)
@@ -761,8 +780,15 @@ function AddJobDrawer() {
     )
 }
 
-export function DataTable({ data: initialData }) {
-    const { deleteJob } = useJobs();
+export function DataTable({
+    data: initialData,
+    submitJob,
+    updateJob,
+    updateCourses,
+    deleteJob,
+    updating,
+    submitting,
+}) {
     const [data, setData] = React.useState(() => initialData)
     const [rowSelection, setRowSelection] = React.useState({})
     const [columnVisibility, setColumnVisibility] = React.useState({})
@@ -782,7 +808,14 @@ export function DataTable({ data: initialData }) {
     )
     const [deleteModal, setDeleteModal] = React.useState({ open: false, jobId: null })
     // Pass setDeleteModal into columns
-    const columns = React.useMemo(() => getColumns(setDeleteModal), [setDeleteModal])
+    const columns = React.useMemo(
+        () => getColumns(setDeleteModal, updateJob, updateCourses, updating),
+        [setDeleteModal, updateJob, updateCourses, updating]
+    )
+
+    React.useEffect(() => {
+        setData(initialData)
+    }, [initialData])
 
 
     const table = useReactTable({
@@ -820,17 +853,16 @@ export function DataTable({ data: initialData }) {
         const toastId = toast.loading('Deleting job...')
 
         if (!deleteModal.jobId) {
-            toast.error('No job selected')
+            toast.error('No job selected', { id: toastId })
             return
         }
         const success = await deleteJob(deleteModal.jobId, { id: toastId })
         if (!success) {
-            toast.error('Failed to delete job')
+            toast.error('Failed to delete job', { id: toastId })
             return
         }
-        toast.success('Job deleted successfully')
+        toast.success('Job deleted successfully', { id: toastId })
         setDeleteModal({ open: false, jobId: null })
-        setTimeout(() => window.location.reload(), 1500)
     }
 
 
@@ -894,7 +926,7 @@ export function DataTable({ data: initialData }) {
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <AddJobDrawer setData={setData} />
+                    <AddJobDrawer submitJob={submitJob} updateCourses={updateCourses} submitting={submitting} />
 
                 </div>
             </div>

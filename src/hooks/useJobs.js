@@ -5,6 +5,8 @@ const useJobs = () => {
     const [jobs, setJobs] = useState([]); // Default is empty array
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [updating, setUpdating] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState(null);
 
     // Fetching jobs
@@ -27,6 +29,46 @@ const useJobs = () => {
 
     useEffect(() => {
         fetchJobs();
+    }, []);
+
+    useEffect(() => {
+        const channel = supabase
+            .channel('jobs-realtime')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'jobs' },
+                payload => {
+                    const created = payload?.new;
+                    if (!created) return;
+                    setJobs(prev => {
+                        if (prev.some(job => job.id === created.id)) return prev;
+                        return [created, ...prev];
+                    });
+                }
+            )
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'jobs' },
+                payload => {
+                    const updated = payload?.new;
+                    if (!updated) return;
+                    setJobs(prev => prev.map(job => (job.id === updated.id ? { ...job, ...updated } : job)));
+                }
+            )
+            .on(
+                'postgres_changes',
+                { event: 'DELETE', schema: 'public', table: 'jobs' },
+                payload => {
+                    const removed = payload?.old;
+                    if (!removed) return;
+                    setJobs(prev => prev.filter(job => job.id !== removed.id));
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     // Submitting a job
@@ -69,7 +111,10 @@ const useJobs = () => {
             if (error) throw error;
 
             if (data?.length) {
-                setJobs(prev => [data[0], ...prev]);
+                setJobs(prev => {
+                    if (prev.some(job => job.id === data[0].id)) return prev;
+                    return [data[0], ...prev];
+                });
             }
 
             return { success: true, data };
@@ -84,7 +129,7 @@ const useJobs = () => {
     };
 
     const updateJob = async (jobId, title, type, category, salary, description, site, isVisible) => {
-        setLoading(true);
+        setUpdating(true);
         setError(null);
         try {
             const { error: updateError } = await supabase
@@ -102,6 +147,21 @@ const useJobs = () => {
 
 
             if (updateError) throw updateError;
+
+            setJobs(prev => prev.map(job => (
+                job.id === jobId
+                    ? {
+                        ...job,
+                        title,
+                        type,
+                        category,
+                        salary,
+                        description,
+                        site,
+                        is_visible: isVisible,
+                    }
+                    : job
+            )));
             return true;
 
         } catch (err) {
@@ -109,7 +169,7 @@ const useJobs = () => {
             setError(err.message)
             return false;
         } finally {
-            setLoading(false)
+            setUpdating(false)
         }
     };
 
@@ -162,7 +222,7 @@ const useJobs = () => {
     }
 
     const deleteJob = async (jobId) => {
-        setLoading(true);
+        setDeleting(true);
         setError(false);
         try {
             const { error: deleteError } = await supabase
@@ -171,6 +231,8 @@ const useJobs = () => {
                 .eq("id", jobId)
 
             if (deleteError) throw deleteError;
+
+            setJobs(prev => prev.filter(job => job.id !== jobId));
             return true;
 
         } catch (err) {
@@ -178,13 +240,25 @@ const useJobs = () => {
             setError(err.message)
             return false;
         } finally {
-            setLoading(false);
+            setDeleting(false);
         }
     };
 
 
 
-    return { jobs, loading, submitting, error, fetchJobs, submitJob, updateCourses, updateJob, deleteJob, }
+    return {
+        jobs,
+        loading,
+        submitting,
+        updating,
+        deleting,
+        error,
+        fetchJobs,
+        submitJob,
+        updateCourses,
+        updateJob,
+        deleteJob,
+    }
 }
 
 

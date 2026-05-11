@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import supabase from "../utils/supabaseClient";
 
 const useApplications = () => {
@@ -6,6 +6,11 @@ const useApplications = () => {
     const [assigneeOptions, setAssigneeOptions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const assigneeOptionsRef = useRef([]);
+
+    useEffect(() => {
+        assigneeOptionsRef.current = assigneeOptions;
+    }, [assigneeOptions]);
 
     useEffect(() => {
         const fetchApplications = async () => {
@@ -60,6 +65,52 @@ const useApplications = () => {
         };
 
         fetchApplications();
+
+        const channel = supabase
+            .channel("applications-realtime")
+            .on(
+                "postgres_changes",
+                {
+                    event: "UPDATE",
+                    schema: "public",
+                    table: "applications",
+                    filter: "job_id=neq.47",
+                },
+                payload => {
+                    const updated = payload?.new;
+                    if (!updated || updated.job_id === 47) return;
+
+                    setApplications(prev =>
+                        prev.map(app => {
+                            if (app.id !== updated.id) return app;
+
+                            const reviewerOption = updated.reviewer_id
+                                ? assigneeOptionsRef.current.find(u => u.id === updated.reviewer_id)
+                                : null;
+                            const assignedOption = updated.assigned
+                                ? assigneeOptionsRef.current.find(u => u.id === updated.assigned)
+                                : null;
+
+                            return {
+                                ...app,
+                                status: updated.status ?? app.status,
+                                updated_at: updated.updated_at ?? app.updated_at,
+                                reviewer: updated.reviewer_id === null
+                                    ? null
+                                    : reviewerOption || app.reviewer,
+                                assigned: updated.assigned === null
+                                    ? null
+                                    : assignedOption || app.assigned,
+                            };
+                        })
+                    );
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
 
