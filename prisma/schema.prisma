@@ -1,0 +1,231 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+
+enum ApplicationStatus {
+  Pending
+  Approved
+  Rejected
+  Reviewing
+}
+
+enum UserRole {
+  Employee
+  Admin
+  HR
+  Mentor
+}
+
+enum ApprenticeStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+enum JobType {
+  FullTime
+  PartTime
+  Internship
+  Contract
+}
+
+model User {
+  id          String   @id @db.Uuid
+  email       String   @unique
+  firstName   String   @map("first_name")
+  lastName    String   @map("last_name")
+  displayName String?  @map("display_name") @db.VarChar(150)
+  createdAt   DateTime @default(now()) @map("created_at")
+  avatarUrl   String?  @map("avatar_url")
+  employeeId  String   @unique @map("employee_id") @db.VarChar(50)
+  phone       String?  @db.VarChar(20)
+  address     String?  @db.VarChar(150)
+  bio         String?
+  role        UserRole @default(Employee)
+  isActive    Boolean  @default(true) @map("is_active")
+
+  departmentId String? @map("department_id") @db.Uuid
+  jobId        Int?    @map("job_id")
+
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  job        Job?        @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  applications         Application[] @relation("Applicant")
+  reviewedApplications Application[] @relation("Reviewer")
+  assignedApplications Application[] @relation("Assigned")  
+  enrollments          Enrollee[]
+  programs             Program[]
+  apprentices          Apprentice[]
+
+  supervisedDepartments Department[] @relation("DepartmentSupervisor")
+
+  @@map("users")
+}
+
+model Job {
+  id          Int     @id @default(autoincrement())
+  title       String  @db.VarChar(150)
+  type        JobType
+  description String
+  salary      String?
+  category    String?
+  site        String
+  isVisible   Boolean @default(true) @map("is_visible")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  applications Application[]
+  users        User[]
+  courses      Course[]
+
+  @@map("jobs")
+}
+
+model Application {
+  id     String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  status ApplicationStatus @default(Pending)
+
+  userId     String  @map("user_id") @db.Uuid
+  reviewerId String? @map("reviewer_id") @db.Uuid
+  assignedId String? @map("assigned") @db.Uuid
+  jobId      Int     @map("job_id")
+
+  resumeUrl      String? @map("resume_url")
+  coverLetterUrl String? @map("cover_letter_url")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User  @relation("Applicant", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer User? @relation("Reviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+  assigned User? @relation("Assigned", fields: [assignedId], references: [id], onDelete: SetNull)
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  schedules Schedule[]
+
+  @@map("applications")
+}
+
+model Schedule {
+  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title String
+
+  applicationId String @map("application_id") @db.Uuid
+
+  startTime DateTime @map("start_time")
+  endTime   DateTime @map("end_time")
+
+  meetingLink String? @map("meeting_link")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("schedules")
+}
+
+model Department {
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @db.VarChar(100)
+
+  supervisorId String? @map("supervisor_id") @db.Uuid
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  supervisor User? @relation("DepartmentSupervisor", fields: [supervisorId], references: [id], onDelete: SetNull)
+
+  users User[]
+
+  @@map("departments")
+}
+
+model Course {
+  id         Int    @id @default(autoincrement())
+  courseLink String @map("course_link")
+  title      String
+
+  jobId Int? @map("job_id")
+
+  job Job? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  enrollees Enrollee[]
+
+  @@map("courses")
+}
+
+model Enrollee {
+  id Int @id @default(autoincrement())
+
+  userId   String? @map("user_id") @db.Uuid
+  courseId Int?    @map("course_id")
+
+  completed Boolean @default(false)
+
+  enrolledAt DateTime? @default(now()) @map("enrolled_at")
+
+  user   User?   @relation(fields: [userId], references: [id])
+  course Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId], map: "uq_user_course")
+  @@map("enrollees")
+}
+
+model Program {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  mentorId String @map("mentor") @db.Uuid
+
+  title       String @db.VarChar(255)
+  topic       String
+  description String
+
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+
+  category String?
+  type     String?
+
+  isVisible Boolean @default(true) @map("is_visible")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  mentor User @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+
+  apprentices Apprentice[]
+
+  @@map("programs")
+}
+
+model Apprentice {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  userId    String @map("user_id") @db.Uuid
+  programId String @map("program_id") @db.Uuid
+
+  status ApprenticeStatus @default(Pending)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@map("apprentice")
+}
